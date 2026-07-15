@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "Master Room | Copy, Paste, Profit",
+    default: "Range Universe | Live Trading Signals & Education",
     template: "%s | Range Universe",
   },
   description:

@@ -1,38 +1,48 @@
-<!-- test: verifying vercel preview pipeline on the rebuild branch — safe to remove -->
+# Range Universe
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Marketing site for [rangeuniverse.com](https://rangeuniverse.com) — live trading
+signals, education, and mentorship.
 
-## Getting Started
+## Stack
 
-First, run the development server:
+- Next.js 15 (App Router) + React 18, TypeScript
+- Tailwind CSS v4
+- Deployed on Vercel (project: `masterroom`)
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route      | What it is                                  |
+| ---------- | ------------------------------------------- |
+| `/`        | Homepage — signals, stats, pricing, FAQ     |
+| `/join`    | Plan selection and checkout                 |
+| `/privacy` | Privacy policy                              |
+| `/terms`   | Terms of service                            |
 
-## Learn More
+`/signals` permanently redirects to `/`, which it used to be. `/mr*` redirects
+to the homepage.
 
-To learn more about Next.js, take a look at the following resources:
+## Payments
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Checkout is handled entirely by **Whop** via hosted links in `/join`. Plan IDs
+are hardcoded there. There is no payment, auth, or database integration in this
+codebase — the Stripe webhook at `src/app/api/webhooks/stripe/route.ts` is an
+unused stub that verifies signatures and discards events. Access is granted
+manually today.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment
 
-## Deploy on Vercel
+Copy `.env.example` to `.env.local`. The Stripe and Supabase variables are
+scaffolding for planned work and are not read by any code that ships today.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pushes to `main` deploy to production; other branches get preview deployments.
