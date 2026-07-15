@@ -551,7 +551,7 @@ function StatsSection() {
             <div className="mt-2 text-[42px] font-black leading-none text-yellow-300">{gain12>=0?`+${gain12}%`:`${gain12}%`}</div>
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-white/10 px-3 py-2" style={{ background:"rgba(255,255,255,.04)" }}><div className="text-[10px] uppercase tracking-[0.22em] text-white/50">Avg Win Rate</div><div className="mt-1 text-lg font-extrabold text-white">{avgWin}%</div></div>
-              <div className="rounded-lg border border-white/10 px-3 py-2" style={{ background:"rgba(255,255,255,.04)" }}><div className="text-[10px] uppercase tracking-[0.22em] text-white/50">Total Trades</div><div className="mt-1 text-lg font-extrabold text-white">{totalTrades.toLocaleString()}</div></div>
+              <div className="rounded-lg border border-white/10 px-3 py-2" style={{ background:"rgba(255,255,255,.04)" }}><div className="text-[10px] uppercase tracking-[0.22em] text-white/50">Total Trades</div><div className="mt-1 text-lg font-extrabold text-white">{totalTrades.toLocaleString("en-US")}</div></div>
             </div>
           </div>
         </div>
@@ -580,7 +580,7 @@ function StatsSection() {
           ))}
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {[["Total RR",`${totalRR} RR`],["Average Win Rate",`${avgWin}%`],["Trades Logged",totalTrades.toLocaleString()]].map(([label,value])=>(
+          {[["Total RR",`${totalRR} RR`],["Average Win Rate",`${avgWin}%`],["Trades Logged",totalTrades.toLocaleString("en-US")]].map(([label,value])=>(
             <div key={String(label)} className="rounded-2xl border border-white/10 p-4" style={{ background:"rgba(255,255,255,.04)" }}>
               <div className="text-[11px] uppercase tracking-widest text-white/50">{String(label)}</div>
               <div className="mt-2 text-[24px] font-extrabold leading-none text-white">{String(value)}</div>
