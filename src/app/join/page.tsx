@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { Anton } from "next/font/google";
 const anton = Anton({ subsets: ["latin"], weight: "400" });
@@ -117,27 +117,15 @@ export default function Join() {
     }));
   }, []);
 
-  useEffect(() => {
-    if (!supportUrl) return;
-
-    let tgDeep = "tg://resolve?domain=rangesupportfx";
-    try {
-      const url = new URL(supportUrl);
-      if (url.hostname === "t.me") {
-        const domain = url.pathname.replace("/", "") || "rangesupportfx";
-        const text = url.searchParams.get("text");
-        tgDeep =
-          `tg://resolve?domain=${domain}` +
-          (text ? `&text=${encodeURIComponent(text)}` : "");
-      }
-    } catch {}
-
-    const deep = window.open(tgDeep, "_blank", "noopener,noreferrer");
-    if (!deep) {
-      const web = window.open(supportUrl, "_blank", "noopener,noreferrer");
-      if (web) web.opener = null;
-    }
-  }, [supportUrl]);
+  // Must stay in the click handler: window.open() outside a user gesture is
+  // popup-blocked. t.me links already hand off to the Telegram app when it is
+  // installed, so a tg:// attempt alongside this would only ever double-open --
+  // window.open() returns null whenever noopener is set, which makes a failed
+  // deep link indistinguishable from a successful one.
+  function openSupport(url: string) {
+    window.open(url, "_blank", "noopener,noreferrer");
+    setSupportUrl(url);
+  }
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-[#0a1016] text-white">
@@ -249,7 +237,7 @@ export default function Join() {
                       const url = `https://t.me/rangesupportfx?text=${encodeURIComponent(
                         message
                       )}`;
-                      setSupportUrl(url);
+                      openSupport(url);
                     }}
                     className="group inline-flex w-full items-center justify-center gap-3 rounded-xl border border-emerald-400/70 bg-emerald-400/10 px-5 py-3 text-sm font-semibold text-emerald-100 backdrop-blur transition hover:border-emerald-300 hover:bg-emerald-400/20"
                   >
@@ -271,7 +259,7 @@ export default function Join() {
           onCrypto={() => {
             const message =
               "Hi, I would like to pay with crypto for the Master Room Lifetime plan. Can you help me complete the payment?";
-            setSupportUrl(
+            openSupport(
               `https://t.me/rangesupportfx?text=${encodeURIComponent(message)}`
             );
           }}
@@ -295,7 +283,7 @@ export default function Join() {
 
       {/* Help dock */}
       <button
-        onClick={() => setSupportUrl("https://t.me/rangesupportfx")}
+        onClick={() => openSupport("https://t.me/rangesupportfx")}
         className="fixed bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
       >
         <img src="/crypto-icon.webp" className="h-4 w-4" alt="" />
