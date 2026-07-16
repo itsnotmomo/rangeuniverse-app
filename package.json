@@ -12,13 +12,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/stripe": "^8.0.416",
     "framer-motion": "^12.23.14",
     "lucide-react": "^0.560.0",
     "next": "^15.5.7",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "stripe": "^19.1.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
