@@ -15,6 +15,9 @@ const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], displa
 const NAV = [['Record', '#record'], ['Process', '#process'], ['Signal', '#signal'], ['Reviews', '#reviews'], ['Pricing', '#pricing']];
 const NEG_ZONE = 22;
 
+// Every CTA hands off straight to the Telegram bot — no on-site checkout.
+const TELEGRAM_BOT = 'https://t.me/rangefx_bot?start=website';
+
 export default function VariantC() {
   return (
     <main className={`vc ${display.variable} ${mono.variable}`}>
@@ -100,7 +103,7 @@ function Header() {
           {NAV.map(([l, h]) => <a key={h} href={h} className="vc-nav" style={{ fontSize: 14, color: 'var(--muted)', textDecoration: 'none', fontWeight: 300 }}>{l}</a>)}
         </nav>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <a href="/join" className="btn btn-primary vc-hide-sm" style={{ padding: '11px 22px', fontSize: 14 }}>Join the room</a>
+          <a href={TELEGRAM_BOT} target="_blank" rel="noopener noreferrer" className="btn btn-primary vc-hide-sm" style={{ padding: '11px 22px', fontSize: 14 }}>Join the room</a>
           <button type="button" onClick={() => setOpen((v) => !v)} aria-label="Menu" aria-expanded={open} className="vc-burger"
             style={{ display: 'grid', placeItems: 'center', height: 40, width: 40, borderRadius: 999, border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink)' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d={open ? 'M6 6l12 12M18 6L6 18' : 'M4 8h16M4 16h16'} /></svg>
@@ -111,7 +114,7 @@ function Header() {
         <div className="vc-mobnav" style={{ background: 'var(--bg)', borderTop: '1px solid var(--line)' }}>
           <div className="wrap" style={{ paddingBlock: 8, display: 'grid' }}>
             {NAV.map(([l, h]) => <a key={h} href={h} onClick={() => setOpen(false)} style={{ padding: '15px 0', fontSize: 17, fontWeight: 300, textDecoration: 'none', borderTop: '1px solid var(--line-soft)' }}>{l}</a>)}
-            <a href="/join" onClick={() => setOpen(false)} className="btn btn-primary" style={{ marginTop: 14, marginBottom: 6 }}>Join the room</a>
+            <a href={TELEGRAM_BOT} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className="btn btn-primary" style={{ marginTop: 14, marginBottom: 6 }}>Join the room</a>
           </div>
         </div>
       )}
@@ -159,7 +162,7 @@ function Hero() {
         <Reveal delay={0.16} style={{ marginTop: 'clamp(40px,6vw,72px)' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '18px 40px', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <div>
-              <a href="/join" className="btn btn-primary">Join the room — €79/mo</a>
+              <a href={TELEGRAM_BOT} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Join the room — €79/mo</a>
               <div className="cta-note">Cancel anytime · about 15 minutes a day</div>
             </div>
             <div style={{ display: 'flex', gap: 'clamp(24px,4vw,48px)' }}>
@@ -387,7 +390,7 @@ function PricingSection() {
           <div className="num" style={{ marginTop: 24, fontSize: 'clamp(56px,11vw,120px)', fontWeight: 400, letterSpacing: '-0.04em', lineHeight: 0.9 }}>€79</div>
           <p className="lede" style={{ marginTop: 20 }}>per month · cancel anytime</p>
           <div style={{ marginTop: 34 }}>
-            <a href="/join" className="btn btn-primary" style={{ padding: '17px 40px', fontSize: 16 }}>Join the room</a>
+            <a href={TELEGRAM_BOT} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '17px 40px', fontSize: 16 }}>Join the room</a>
             <div className="cta-note">Daily signals, live management, weekly Q&amp;A, and the full trade archive.</div>
           </div>
         </Reveal>
