@@ -1,812 +1,375 @@
 'use client';
 
 import Image from 'next/image';
-import React, { Fragment, useEffect, useMemo, useRef, useState, ReactNode } from 'react';
+import React, { useState } from 'react';
+import { Figtree, JetBrains_Mono } from 'next/font/google';
+import {
+  AGG, COLUMN_IMAGES, FAQS, MONTH_ABBR, PAIRS, STEPS,
+  TELEGRAM_SUPPORT, barGeom, fmtPct,
+} from '@/lib/trackRecord';
+import { CountUp, Reveal } from '@/lib/v2motion';
 
-const SHOW_DISCOUNT_RIBBON = false;
-const SHOW_BOOTCAMP_RIBBON = false;
+const display = Figtree({ subsets: ['latin'], weight: ['300', '400', '500'], display: 'swap', variable: '--c-display' });
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], display: 'swap', variable: '--c-mono' });
 
-function hexA(hex: string, a = 1) {
-  const h = hex.replace('#', '');
-  const n = parseInt(h, 16);
-  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
-  return `rgba(${r},${g},${b},${a})`;
-}
+const NAV = [['Record', '#record'], ['Process', '#process'], ['Signal', '#signal'], ['Reviews', '#reviews'], ['Pricing', '#pricing']];
+const NEG_ZONE = 22;
 
-const BRAND = {
-  PURPLE: '#6d28d9',
-  PURPLE_DARK: '#5b21b6',
-  PURPLE_LIGHT: '#8b5cf6',
-  CARD_BG: '#070A10',
-};
-const GOLD = 'linear-gradient(135deg, #fef9c3, #fde047, #fbbf24)';
-const GOLD_SOLID = '#fde047';
-
-type MonthStat = { month: string; year: number; trades: number; wins: number; losses: number; rr: number; winRatePct: number; gainPct: number; };
-const ALL_STATS: MonthStat[] = [
-  { month: 'October',   year: 2023, trades: 44, wins: 22, losses: 22, rr: 174, winRatePct: 50, gainPct: 12 },
-  { month: 'November',  year: 2023, trades: 58, wins: 31, losses: 27, rr: 186, winRatePct: 53, gainPct: 16 },
-  { month: 'December',  year: 2023, trades: 38, wins: 24, losses: 14, rr: 121, winRatePct: 63, gainPct: 11 },
-  { month: 'January',   year: 2024, trades: 35, wins: 17, losses: 18, rr: 102, winRatePct: 48, gainPct: 9 },
-  { month: 'February',  year: 2024, trades: 51, wins: 26, losses: 25, rr: 173, winRatePct: 51, gainPct: 15 },
-  { month: 'March',     year: 2024, trades: 41, wins: 20, losses: 21, rr: 227, winRatePct: 49, gainPct: 13.4 },
-  { month: 'April',     year: 2024, trades: 35, wins: 14, losses: 21, rr: 218, winRatePct: 40, gainPct: 12.1 },
-  { month: 'May',       year: 2024, trades: 45, wins: 22, losses: 23, rr: 138, winRatePct: 49, gainPct: 12.7 },
-  { month: 'June',      year: 2024, trades: 37, wins: 17, losses: 20, rr: 89,  winRatePct: 45, gainPct: 4.9 },
-  { month: 'July',      year: 2024, trades: 41, wins: 17, losses: 24, rr: 99,  winRatePct: 40, gainPct: 3 },
-  { month: 'August',    year: 2024, trades: 44, wins: 20, losses: 24, rr: 133, winRatePct: 45, gainPct: 7 },
-  { month: 'September', year: 2024, trades: 39, wins: 17, losses: 22, rr: 125, winRatePct: 43, gainPct: 6 },
-  { month: 'October',   year: 2024, trades: 44, wins: 22, losses: 22, rr: 174, winRatePct: 50, gainPct: 12 },
-  { month: 'November',  year: 2024, trades: 40, wins: 22, losses: 18, rr: 157, winRatePct: 55, gainPct: 8 },
-  { month: 'December',  year: 2024, trades: 21, wins: 5,  losses: 16, rr: 32,  winRatePct: 41, gainPct: 0.5 },
-  { month: 'January',   year: 2025, trades: 12, wins: 5,  losses: 7,  rr: 27,  winRatePct: 41, gainPct: 1.2 },
-  { month: 'February',  year: 2025, trades: 22, wins: 10, losses: 12, rr: 107, winRatePct: 45, gainPct: 8.9 },
-  { month: 'March',     year: 2025, trades: 37, wins: 17, losses: 20, rr: 214, winRatePct: 46, gainPct: 12.1 },
-  { month: 'April',     year: 2025, trades: 32, wins: 19, losses: 13, rr: 158, winRatePct: 59, gainPct: 8.8 },
-  { month: 'May',       year: 2025, trades: 30, wins: 16, losses: 14, rr: 120, winRatePct: 53, gainPct: 4.4 },
-  { month: 'June',      year: 2025, trades: 20, wins: 6,  losses: 14, rr: -14, winRatePct: 30, gainPct: -2.5 },
-  { month: 'July',      year: 2025, trades: 34, wins: 19, losses: 15, rr: 126, winRatePct: 56, gainPct: 6.5 },
-  { month: 'August',    year: 2025, trades: 24, wins: 13, losses: 11, rr: 106, winRatePct: 54, gainPct: 4.2 },
-  { month: 'September', year: 2025, trades: 26, wins: 14, losses: 12, rr: 167, winRatePct: 55, gainPct: 10.2 },
-  { month: 'October',   year: 2025, trades: 32, wins: 19, losses: 13, rr: 178, winRatePct: 59, gainPct: 12.1 },
-  { month: 'November',  year: 2025, trades: 30, wins: 15, losses: 15, rr: 125, winRatePct: 50, gainPct: 6.2 },
-  { month: 'December',  year: 2025, trades: 22, wins: 12, losses: 10, rr: 102, winRatePct: 54, gainPct: 3.4 },
-  { month: 'January',   year: 2026, trades: 28, wins: 14, losses: 14, rr: 115, winRatePct: 50, gainPct: 4.6 },
-  { month: 'February',  year: 2026, trades: 22, wins: 12, losses: 10, rr: 124, winRatePct: 54, gainPct: 5.1 },
-  { month: 'March',     year: 2026, trades: 18, wins: 9, losses: 9, rr: 118, winRatePct: 50, gainPct: 7.6 },
-  { month: 'April',     year: 2026, trades: 23, wins: 13, losses: 10, rr: 148, winRatePct: 57, gainPct: 7.1 },
-  { month: 'May',     year: 2026, trades: 18, wins: 8, losses: 10, rr: 92, winRatePct: 44, gainPct: 2.2 },
-  { month: 'June',     year: 2026, trades: 16, wins: 8, losses: 8, rr: 102, winRatePct: 50, gainPct: 3.1 },
-  
-];
-const MONTH_ORDER = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-const COLUMN_IMAGES = [
-  ["/students/1.webp","/students/2.webp","/students/3.webp","/students/4.webp","/students/5.webp","/students/16.webp","/students/17.webp"],
-  ["/students/6.webp","/students/7.webp","/students/8.webp","/students/9.webp","/students/10.webp","/students/18.webp","/students/19.webp","/students/22.webp"],
-  ["/students/11.webp","/students/12.webp","/students/13.webp","/students/14.webp","/students/15.webp","/students/20.webp","/students/21.webp"],
-];
-
-export default function Home() {
+export default function VariantC() {
   return (
-    <main className="min-h-screen bg-black text-white overflow-x-hidden">
-      <div className="relative">
-        <Header />
-        <Hero />
-      </div>
-      <ActionIntro />
-      <ToolsPathSection />
-      <StatsSection />
-      <PairsSection />
-      <ProgramSlices />
-      <ChoosePathSection />
-      <StudentWinsSection />
-      <FaqSection />
-      <FloatingActions />
+    <main className={`vc ${display.variable} ${mono.variable}`}>
+      <Tokens />
+      <Header />
+      <Hero />
+      <ScaleSection />
+      <ProcessSection />
+      <SignalSection />
+      <ReviewsSection />
+      <PricingSection />
+      <Footer />
     </main>
   );
 }
 
-/* =============================================================================
-   HEADER — bulletproof mobile menu that never shifts page content
-   ========================================================================== */
-function Header() {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-
-  // Lock body scroll when menu open
-  React.useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
-
-  // Close on Escape
-  React.useEffect(() => {
-    if (!mobileOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [mobileOpen]);
-
-  const close = () => setMobileOpen(false);
-
+function Tokens() {
   return (
-    <>
-      {/* Static header bar — height never changes, nothing inside moves */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-black/40 border-b border-white/20">
-        <div className="mx-auto flex h-[80px] w-full max-w-6xl items-center justify-between px-6">
+    <style dangerouslySetInnerHTML={{ __html: `
+.vc{
+  --bg:#F5F5F2;
+  --surface:#FCFCFB;
+  --ink:#1B1D1C;
+  --ink-2:#3E4441;
+  --muted:#6E756F;
+  --muted-dim:#9AA09A;
+  --line:#E4E4DE;
+  --line-soft:#ECECE6;
+  --sage:#4B7A62;
+  --clay:#B45C4E;
+  --accent:#1B1D1C;
 
-          {/* Logo */}
-          <a href="#home" className="flex items-center gap-3">
-            <Image src="/mr-logo.webp" alt="Master Room" width={40} height={40} priority />
-            <span className="font-bold text-base tracking-wide text-white">MASTER ROOM</span>
-          </a>
+  --f-display:var(--c-display),system-ui,sans-serif;
+  --f-mono:var(--c-mono),ui-monospace,monospace;
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-6 text-sm md:flex">
-            {[['Info','#info'],['Stats','#stats'],['Pairs','#pairs'],['Pricing','#pricing'],['Reviews','#reviews'],['FAQ','#faq']].map(([label,href]) => (
-              <a key={href} href={href} className="text-white/70 hover:text-white transition-colors">{label}</a>
-            ))}
-          </nav>
+  --gut:clamp(22px,6vw,64px);
+  --maxw:1080px;
 
-          {/* Desktop CTAs */}
-          <div className="hidden items-center gap-3 md:flex">
-            <a href="/join" className="px-6 py-2.5 rounded-full text-black font-semibold text-sm hover:brightness-110 transition" style={{ background: GOLD }}>
-              Join Now
-            </a>
-            <a href="https://t.me/+K8Nzz9B0aaQzN2Y0" target="_blank" rel="noopener noreferrer"
-              className="px-4 py-2.5 rounded-full text-sm font-semibold text-white/80 hover:text-white border border-white/20 transition">
-              Free Telegram
-            </a>
-          </div>
+  background:var(--bg);color:var(--ink);
+  font-family:var(--f-display);font-weight:400;font-size:17px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;
+}
+.vc ::selection{background:var(--ink);color:var(--bg);}
+.vc :focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:2px;}
+.vc .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gut);}
 
-          {/* Mobile: Join pill + hamburger */}
-          <div className="flex items-center gap-3 md:hidden">
-            <a href="/join" className="rounded-full px-4 py-2 text-sm font-semibold text-black" style={{ background: GOLD }}>
-              Join
-            </a>
-            <button
-              type="button"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Open menu"
-              aria-expanded={mobileOpen}
-              className="grid h-11 w-11 place-items-center rounded-xl border border-white/20 bg-white/5 text-white"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
+.vc .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-0.03em;}
+.vc .eyebrow{font-family:var(--f-mono);font-size:11px;font-weight:400;letter-spacing:0.24em;text-transform:uppercase;color:var(--muted);}
+.vc .lede{color:var(--muted);font-size:clamp(17px,1.9vw,21px);line-height:1.65;font-weight:300;}
+
+.vc .sec{padding-block:clamp(84px,13vw,180px);border-top:1px solid var(--line);}
+.vc .sec-title{font-family:var(--f-display);font-weight:300;font-size:clamp(30px,5vw,54px);line-height:1.08;letter-spacing:-0.02em;}
+
+.vc .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--f-display);font-size:15px;font-weight:500;padding:15px 30px;border-radius:999px;border:1px solid transparent;text-decoration:none;cursor:pointer;transition:background .2s,color .2s,border-color .2s,transform .1s;white-space:nowrap;}
+.vc .btn:active{transform:translateY(1px);}
+.vc .btn-primary{background:var(--ink);color:var(--bg);}
+.vc .btn-primary:hover{background:#000;}
+.vc .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+.vc .btn-ghost:hover{border-color:var(--muted);}
+.vc .cta-note{margin-top:14px;font-size:13px;color:var(--muted-dim);font-weight:300;}
+
+.vc .kpi-label{font-family:var(--f-mono);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted-dim);}
+.vc .kpi-value{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:400;letter-spacing:-0.04em;line-height:1;}
+.vc a{color:inherit;}
+.vc strong{font-weight:500;}
+
+@keyframes vc-bar{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion: reduce){ .vc .bar-fill{transform:none !important;animation:none !important;} }
+` }} />
+  );
+}
+
+function Header() {
+  const [open, setOpen] = useState(false);
+  return (
+    <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(245,245,242,0.8)', backdropFilter: 'blur(12px)' }}>
+      <div className="wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 74, gap: 18 }}>
+        <a href="#top" style={{ display: 'flex', alignItems: 'center', gap: 11, textDecoration: 'none' }}>
+          <Image src="/mr-logo.webp" alt="" width={24} height={24} priority />
+          <span className="num" style={{ fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase' }}>Range Universe</span>
+        </a>
+        <nav className="vc-desknav" style={{ display: 'none', gap: 30 }}>
+          {NAV.map(([l, h]) => <a key={h} href={h} className="vc-nav" style={{ fontSize: 14, color: 'var(--muted)', textDecoration: 'none', fontWeight: 300 }}>{l}</a>)}
+        </nav>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <a href="/join" className="btn btn-primary vc-hide-sm" style={{ padding: '11px 22px', fontSize: 14 }}>Join the room</a>
+          <button type="button" onClick={() => setOpen((v) => !v)} aria-label="Menu" aria-expanded={open} className="vc-burger"
+            style={{ display: 'grid', placeItems: 'center', height: 40, width: 40, borderRadius: 999, border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink)' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d={open ? 'M6 6l12 12M18 6L6 18' : 'M4 8h16M4 16h16'} /></svg>
+          </button>
         </div>
-      </header>
-
-      {/* Mobile overlay — rendered outside header, z-[200], never affects layout */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[200] md:hidden" role="dialog" aria-modal>
-          {/* Dimmed backdrop — tap to close */}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={close} aria-hidden />
-
-          {/* Drawer slides in from the top, sits above everything */}
-          <div className="absolute inset-x-0 top-0 bg-black border-b border-white/10 shadow-2xl">
-            <div className="mx-auto max-w-6xl px-6 py-5">
-
-              {/* Header row inside drawer */}
-              <div className="flex h-12 items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Image src="/mr-logo.webp" alt="Master Room" width={40} height={40} />
-                  <span className="font-bold text-base tracking-wide text-white">MASTER ROOM</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={close}
-                  aria-label="Close menu"
-                  className="grid h-11 w-11 place-items-center rounded-lg border border-white/10 bg-white/5 text-white"
-                >
-                  <svg width="19" height="19" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-                    <path d="M6 6l12 12M18 6l-12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Nav links */}
-              <nav className="mt-5 grid gap-2 text-sm">
-                {[['Info','#info'],['Pairs','#pairs'],['Stats','#stats'],['Pricing','#pricing'],['Reviews','#reviews'],['FAQ','#faq']].map(([label,href]) => (
-                  <a key={href} href={href} onClick={close}
-                    className="rounded-md px-3 py-2 text-white/80 hover:bg-white/5 hover:text-white transition-colors">
-                    {label}
-                  </a>
-                ))}
-              </nav>
-
-              {/* CTA row */}
-              <div className="mt-5 pb-2 flex items-center gap-3">
-                <a href="/join" className="flex-1 rounded-full px-4 py-2.5 text-center text-sm font-semibold text-black" style={{ background: GOLD }}>
-                  Enroll Today
-                </a>
-                <a href="https://t.me/rangesupportfx" target="_blank" rel="noopener noreferrer"
-                  aria-label="Telegram support"
-                  className="grid h-11 w-11 place-items-center rounded-lg border border-white/10 bg-white/5 text-white">
-                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
-                    <path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4 20-7z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
+      </div>
+      {open && (
+        <div className="vc-mobnav" style={{ background: 'var(--bg)', borderTop: '1px solid var(--line)' }}>
+          <div className="wrap" style={{ paddingBlock: 8, display: 'grid' }}>
+            {NAV.map(([l, h]) => <a key={h} href={h} onClick={() => setOpen(false)} style={{ padding: '15px 0', fontSize: 17, fontWeight: 300, textDecoration: 'none', borderTop: '1px solid var(--line-soft)' }}>{l}</a>)}
+            <a href="/join" onClick={() => setOpen(false)} className="btn btn-primary" style={{ marginTop: 14, marginBottom: 6 }}>Join the room</a>
           </div>
         </div>
       )}
-    </>
-  );
-}
-
-function Hero() {
-  return (
-    <section id="home" className="relative w-full overflow-hidden bg-black">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_65%)]" />
-        <div className="absolute -left-1/4 top-[-20%] h-[140%] w-[60%] rotate-12 bg-gradient-to-b from-purple-500/20 via-transparent to-transparent blur-3xl" />
-        <div className="absolute -right-1/4 top-[-20%] h-[140%] w-[60%] -rotate-12 bg-gradient-to-b from-yellow-400/15 via-transparent to-transparent blur-3xl" />
-        <div className="absolute left-0 top-1/2 h-[520px] w-[520px] -translate-y-1/2 bg-purple-500/10 blur-3xl" />
-        <div className="absolute right-0 top-1/2 h-[520px] w-[520px] -translate-y-1/2 bg-yellow-400/8 blur-3xl" />
-        <div className="absolute inset-0 opacity-[0.035]"
-          style={{ backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.4'/></svg>\")" }} />
-      </div>
-      <div className="relative mx-auto max-w-6xl px-5 pt-36 pb-16 md:px-6 md:pt-44 md:pb-20 text-center">
-        <p className="mb-4 text-xs font-semibold tracking-[0.35em] uppercase text-white/40">master room</p>
-        <h1 className="mb-5 text-5xl font-extrabold leading-tight sm:text-6xl md:text-[68px] md:leading-[1.04]">
-          Copy.{' '}<span className="text-yellow-300">Paste.</span>{' '}Profit.
-        </h1>
-        <p className="mb-2 max-w-2xl mx-auto text-base text-zinc-300 md:text-lg leading-7">
-          Join the <span className="font-semibold text-white">Master Room</span> — copy signals from professional traders, follow the exact entries, and{' '}
-          <span className="font-semibold text-white">start profiting today.</span>
-        </p>
-        <div className="mx-auto mt-12 max-w-6xl">
-          <div className="hidden md:flex md:items-stretch md:gap-0">
-            <div className="flex-1 min-w-0"><HeroStepCard iconSrc="/cards/last1_icon.webp" title={`Join The\nMaster Room`} bullets={['Create your account in seconds and unlock daily signals to profitable trades.','You will receive winning signals EVERY SINGLE DAY.']} /></div>
-            <div className="flex items-center justify-center px-4 shrink-0"><ProcessArrowRight /></div>
-            <div className="flex-1 min-w-0"><HeroStepCard iconSrc="/cards/last2_icon.webp" title={`Copy Our\nTrades`} bullets={['Each signal comes with exact entries, SL & multiple TPs, formatted for trade copiers.','When confirmations align, we execute. You just copy.']} /></div>
-            <div className="flex items-center justify-center px-4 shrink-0"><ProcessArrowRight /></div>
-            <div className="flex-1 min-w-0"><HeroStepCard iconSrc="/cards/last3_icon.webp" title={`Generate\nProfit`} bullets={['Use the Risk Manager to size by balance & risk %, partials & targets done for you.','Secure profits by simply following our calls.']} /></div>
-          </div>
-          <div className="grid grid-cols-1 gap-5 md:hidden">
-            <HeroStepCard iconSrc="/cards/last1_icon.webp" title={`Join The\nMaster Room`} bullets={['Create your account in seconds and unlock daily signals to profitable trades.','You will receive winning signals EVERY SINGLE DAY.']} />
-            <ProcessArrowDown />
-            <HeroStepCard iconSrc="/cards/last2_icon.webp" title={`Copy Our\nTrades`} bullets={['Each signal comes with exact entries, SL & multiple TPs, formatted for trade copiers.','When confirmations align, we execute. You just copy.']} />
-            <ProcessArrowDown />
-            <HeroStepCard iconSrc="/cards/last3_icon.webp" title={`Generate\nProfit`} bullets={['Use the Risk Manager to size by balance & risk %, partials & targets done for you.','Secure profits by simply following our calls.']} />
-          </div>
-        </div>
-        <div className="mt-10 flex flex-col items-center gap-5">
-          <div className="flex items-center justify-center gap-4 sm:gap-6">
-            <Image src="/arrow_left.webp" alt="" width={46} height={46} loading="lazy" />
-            <a href="/join" className="inline-flex items-center justify-center px-14 py-4 text-sm font-semibold text-black shadow-xl transition hover:brightness-110 md:text-base" style={{ background: GOLD }}>Enroll Today</a>
-            <Image src="/arrow_left.webp" alt="" width={46} height={46} loading="lazy" className="-scale-x-100" />
-          </div>
-          <div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 backdrop-blur">
-            <div className="flex -space-x-2">
-              {[1,2,3,4].map(i => <Image key={i} src={`/avatars/user${i}.webp`} alt="student" width={32} height={32} className="rounded-full ring-2 ring-white/20" loading="lazy" />)}
-            </div>
-            <span className="text-xs sm:text-sm text-white/85"><b className="text-white">10,000</b>+ Students Enrolled</span>
-          </div>
-          <ValueRibbon />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HeroStepCard({ iconSrc, title, bullets }: { iconSrc: string; title: string; bullets: string[] }) {
-  return (
-    <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#070A10] p-6 h-full shadow-[0_70px_200px_rgba(0,0,0,0.85)]">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/2 h-56 w-[400px] -translate-x-1/2 rounded-full bg-purple-500/10 blur-3xl" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-black/70" />
-      </div>
-      <div className="relative flex flex-col items-center text-center">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3 shadow-[0_6px_18px_rgba(0,0,0,.4)]">
-          <Image src={iconSrc} alt="" width={48} height={48} className="opacity-95" />
-        </div>
-        <h3 className="mt-4 whitespace-pre-line font-semibold leading-tight text-white text-[20px] sm:text-[22px]">{title}</h3>
-        <div className="mx-auto my-4 h-px w-9/12 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-        <ul className="space-y-2 text-[13px] sm:text-[13.5px] leading-7 text-zinc-400">
-          {bullets.map((b, i) => <li key={i}>{b}</li>)}
-        </ul>
-      </div>
-    </div>
-  );
-}
-
-function ProcessArrowRight() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden className="drop-shadow-[0_0_14px_rgba(253,224,71,0.55)]">
-      <defs><linearGradient id="ga" x1="0" y1="0" x2="32" y2="0"><stop offset="0%" stopColor="#f7d87a" /><stop offset="50%" stopColor="#fde047" /><stop offset="100%" stopColor="#fbbf24" /></linearGradient></defs>
-      <path d="M11 8l10 8-10 8" stroke="url(#ga)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function ProcessArrowDown() {
-  return (
-    <div className="flex items-center justify-center my-1">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden className="drop-shadow-[0_0_14px_rgba(253,224,71,0.55)]">
-        <defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="32"><stop offset="0%" stopColor="#f7d87a" /><stop offset="100%" stopColor="#fbbf24" /></linearGradient></defs>
-        <path d="M8 12l8 10 8-10" stroke="url(#gb)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </div>
-  );
-}
-
-function ValueRibbon() {
-  const items = [
-    { value: "10K+", label: "Success Stories", icon: "trophy" as const },
-    { value: "5+",   label: "Pairs Traded",    icon: "pair"   as const },
-    { value: "5K+",  label: "Active Members",  icon: "users"  as const },
-  ];
-  return (
-    <div className="w-full">
-      <div className="mx-auto w-full max-w-4xl rounded-2xl p-[1px]" style={{ background: `linear-gradient(135deg, ${hexA('#6d28d9',.9)}, ${hexA('#a78bfa',.9)} 45%, ${hexA('#fde047',.9)})` }}>
-        <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(180deg, rgba(20,18,28,.92), rgba(7,10,16,.96))" }}>
-          <div className="grid grid-cols-3">
-            {items.map((it, i) => (
-              <div key={i} className="relative px-4 py-5 text-center">
-                {i > 0 && <div className="absolute left-0 top-4 bottom-4 w-px hidden md:block bg-gradient-to-b from-transparent via-white/15 to-transparent" />}
-                <div className="mx-auto grid h-9 w-9 place-items-center rounded-xl" style={{ background: `conic-gradient(from 210deg, ${hexA('#fde047',.7)}, ${hexA('#6d28d9',.7)}, ${hexA('#a78bfa',.7)})` }}>
-                  <div className="h-8 w-8 grid place-items-center rounded-lg bg-black/75">
-                    {it.icon === "trophy" && <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 5h12v3a6 6 0 0 1-12 0V5Z" stroke="white" strokeWidth="1.4"/><path d="M18 5h3v1a4 4 0 0 1-4 4" stroke="white" strokeWidth="1.4"/><path d="M6 5H3v1a4 4 0 0 0 4 4" stroke="white" strokeWidth="1.4"/><path d="M12 14v3M9 20h6" stroke="white" strokeWidth="1.4" strokeLinecap="round"/></svg>}
-                    {it.icon === "pair"  && <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 16l5-5 4 4 7-7" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="7" r="2" stroke="white" strokeWidth="1.4"/><circle cx="18" cy="10" r="2" stroke="white" strokeWidth="1.4"/></svg>}
-                    {it.icon === "users" && <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M16 11a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z" stroke="white" strokeWidth="1.4"/><path d="M4 20a6 6 0 0 1 16 0" stroke="white" strokeWidth="1.4" strokeLinecap="round"/></svg>}
-                  </div>
-                </div>
-                <div className="mt-2 text-xl md:text-2xl font-extrabold leading-none text-white">{it.value}</div>
-                <div className="mt-1 text-[12.5px] md:text-sm text-white/70">{it.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ActionIntro() {
-  return (
-    <section id="info" className="relative bg-black py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_left,rgba(109,40,217,0.14),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(253,224,71,0.08),transparent_55%)]" />
-      </div>
-      <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 md:grid-cols-2">
-        <div>
-          <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold tracking-[0.25em] uppercase text-white/60 mb-6">TAKE ACTION</div>
-          <h2 className="text-4xl font-semibold leading-tight md:text-5xl text-white">Get Paid And Learn</h2>
-          <div className="mt-6 space-y-4 text-base leading-7 text-zinc-400">
-            <p>We share the market outlooks every morning at 9 a.m. — bias, zones, timing.</p>
-            <p>Once a trade presents itself, we share it with you.</p>
-            <p>All you have to do is Copy the signal, Place the trade, Follow the updates. <span className="text-white font-semibold">That&apos;s it.</span></p>
-            <p>You will receive new reports whenever the market shifts — so you can stay up to date.</p>
-            <p>With this structure, you start to <span className="text-white font-semibold">generate money and learn the strategy at the same time.</span></p>
-            <p>Win-Win scenario. Most of our students profit <span className="text-white font-semibold">within hours.</span></p>
-          </div>
-          <a href="/join" className="mt-8 inline-flex items-center justify-center px-10 py-4 text-sm font-semibold text-black shadow-xl transition hover:brightness-110 md:text-base" style={{ background: GOLD }}>Enroll Today — Start Earning</a>
-        </div>
-        <div className="relative">
-          <div className="pointer-events-none absolute -left-8 -top-10 h-64 w-64 rounded-full bg-purple-500/15 blur-3xl" />
-          <Image src="/phone1.webp" alt="Master Room app preview" width={520} height={980} className="relative mx-auto select-none drop-shadow-2xl" priority />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ToolsPathSection() {
-  const timelineRef = useRef<HTMLDivElement | null>(null);
-  const lineRef = useRef<HTMLDivElement | null>(null);
-  const gutterRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const LEFT_ON_SMALL_UNTIL = 1024, LEFT_OFFSET = 28;
-  const rows = useMemo(() => [
-    { id:"r1", leftMd:320, leftLg:360, imgSrc:"/phone.webp", imgAlt:"Phone UI preview", padClass:"p-3 md:p-4 lg:p-6", feature:{ iconSrc:"/profits.svg", title:"Profitable Trade Setups", bullets:["Precise entries with SL/TP and RR targets","Live session alerts so you don't miss moves","Transparent tracking: win rate, RR, payouts"] } },
-    { id:"r2", leftMd:340, leftLg:380, imgSrc:"/mac.webp", imgAlt:"Mac dashboard preview", padClass:"p-1.5 md:p-2 lg:p-3", feature:{ iconSrc:"/strategy.svg", title:"Proven Strategy, Not Luck", bullets:["One strategy refined over years (repeatable)","Checklist: structure → confirmation → execution","Strict risk model that protects capital"] } },
-    { id:"r3", leftMd:300, leftLg:330, imgSrc:"/help.webp", imgAlt:"Help and support preview", padClass:"p-4 md:p-6 lg:p-8", feature:{ iconSrc:"/support.svg", title:"Direct Support From Range", bullets:["1:1 chart reviews and corrections","Fast answers on entries, management, psychology","Weekly action steps & accountability"] } },
-  ], []);
-  const [progress, setProgress] = useState(0);
-  useEffect(() => {
-    const el = timelineRef.current; if (!el) return;
-    const onScroll = () => { const rect = el.getBoundingClientRect(); const vh = window.innerHeight; setProgress(Math.min(1,Math.max(0,-rect.top/Math.max(rect.height-vh,1)))); };
-    onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
-    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
-  }, []);
-  const [arrowY, setArrowY] = useState(0);
-  const [arrowTilt, setArrowTilt] = useState(0);
-  const velRef = useRef<number>(0); const lastTsRef = useRef<number | null>(null);
-  useEffect(() => {
-    const K=16, D=2*Math.sqrt(K); let raf=0;
-    const step = (ts: number) => {
-      const lineH = lineRef.current?.clientHeight ?? timelineRef.current?.clientHeight ?? 0;
-      const pad=18, minY=pad, maxY=Math.max(lineH-pad,pad), targetY=minY+(maxY-minY)*progress;
-      const last=lastTsRef.current??ts; const dt=Math.min((ts-last)/1000,0.033); lastTsRef.current=ts;
-      setArrowY(x => { const vPrev=velRef.current; const a=K*(targetY-x)-D*vPrev; const v=vPrev+a*dt; velRef.current=Math.abs(v)<0.002?0:v; let next=x+v*dt; if(next<minY){next=minY;velRef.current=0;}else if(next>maxY){next=maxY;velRef.current=0;} setArrowTilt(Math.max(-8,Math.min(8,v*120))); return next; });
-      raf=window.requestAnimationFrame(step);
-    };
-    raf=window.requestAnimationFrame(step); return ()=>window.cancelAnimationFrame(raf);
-  }, [progress]);
-  const [tlx, setTlx] = useState(0);
-  useEffect(() => {
-    const computeX = () => {
-      const tl=timelineRef.current,gut=gutterRef.current,cont=containerRef.current; if(!tl) return;
-      const tlRect=tl.getBoundingClientRect(); let x:number;
-      if(window.innerWidth<LEFT_ON_SMALL_UNTIL&&cont){const contRect=cont.getBoundingClientRect();x=contRect.left-tlRect.left+LEFT_OFFSET;}
-      else if(gut){const gutRect=gut.getBoundingClientRect();x=gutRect.left-tlRect.left+gutRect.width/2;}
-      else x=tlRect.width/2; setTlx(x);
-    };
-    computeX();
-    const ro=typeof ResizeObserver!=="undefined"?new ResizeObserver(computeX):null;
-    if(ro){if(timelineRef.current)ro.observe(timelineRef.current);if(gutterRef.current)ro.observe(gutterRef.current);if(containerRef.current)ro.observe(containerRef.current);}
-    window.addEventListener("resize",computeX,{passive:true});
-    return ()=>{if(ro)ro.disconnect();window.removeEventListener("resize",computeX);};
-  }, [LEFT_ON_SMALL_UNTIL,LEFT_OFFSET]);
-
-  return (
-    <section className="relative w-full bg-black text-white">
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes fadeSlideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .dark-pill{border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);border-radius:9999px;transition:transform .18s ease,box-shadow .18s ease;}
-        .dark-pill:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.4);}
-        .pill-bullet{display:flex;align-items:center;gap:.75rem;padding:1rem 1.2rem;}
-        .pill-row{display:flex;flex-direction:column;gap:.9rem;}
-        .headline-grad-dark{background:linear-gradient(90deg,#fff,#a78bfa 70%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+        .vc .vc-nav:hover{color:var(--ink);}
+        @media(min-width:900px){ .vc .vc-desknav{display:flex !important;} .vc .vc-burger,.vc .vc-mobnav{display:none !important;} }
+        @media(max-width:560px){ .vc .vc-hide-sm{display:none !important;} }
       ` }} />
-      <div ref={containerRef} className="mx-auto max-w-7xl px-4 pt-0 pb-16 md:pt-0 md:pb-20 md:px-6 lg:px-8">
-        <header className="mb-12 text-center">
-          <p className="uppercase tracking-[.22em] text-xs text-white/40">A step-by-step path</p>
-          <h2 className="mt-3 text-3xl font-extrabold leading-tight md:text-5xl headline-grad-dark">Tools To Maximize Your Income</h2>
-        </header>
-        <div ref={timelineRef} className="relative">
-          <div className="pointer-events-none absolute top-0 h-full w-[26px]" style={{ left:`${tlx-13}px`, background:"radial-gradient(12px 240px at 50% 50%,rgba(109,40,217,0.15),rgba(109,40,217,0) 70%)" }} aria-hidden />
-          <div ref={lineRef} className="pointer-events-none absolute top-0 h-full w-px" style={{ left:`${tlx}px`, background:"linear-gradient(180deg,rgba(255,255,255,.05) 0%,rgba(109,40,217,.5) 50%,rgba(255,255,255,.05) 100%)", boxShadow:"0 0 22px rgba(109,40,217,.3)" }} aria-hidden />
-          <div className="pointer-events-none absolute z-10 will-change-transform" style={{ left:`${tlx}px`, top:0, transform:`translate3d(-50%,${arrowY}px,0) rotate(${arrowTilt}deg)` }} aria-hidden>
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-[#0b0f18] border border-white/15 text-white shadow-[0_10px_30px_rgba(0,0,0,.6),0_0_0_6px_rgba(109,40,217,.15)]">
-              <Image src="/arrowdown.webp" alt="scroll arrow" width={20} height={20} draggable={false} />
+    </header>
+  );
+}
+
+/* HERO — the record as a large, calm centerpiece */
+function Hero() {
+  const { first, months, gain12, totalTrades, avgWin } = AGG;
+  return (
+    <section id="top" style={{ paddingTop: 'clamp(48px,8vw,104px)', paddingBottom: 'clamp(48px,8vw,96px)' }}>
+      <div className="wrap">
+        <Reveal>
+          <p className="eyebrow">Range Universe — signals &amp; education</p>
+          <h1 className="sec-title" style={{ marginTop: 26, fontSize: 'clamp(36px,6.4vw,74px)', maxWidth: '15ch' }}>
+            {months} months of signals, every month on the record.
+          </h1>
+          <p className="lede" style={{ marginTop: 28, maxWidth: '52ch' }}>
+            Copy the exact entries, stops, and targets we trade. Every month since {MONTH_ABBR[first.month]} {first.year} is shown below — the losing ones included.
+          </p>
+        </Reveal>
+
+        {/* the calm centerpiece */}
+        <Reveal delay={0.1} style={{ marginTop: 'clamp(48px,7vw,88px)' }}>
+          <div className="vc-hero-figure">
+            <div>
+              <div className="kpi-label">Trailing 12-month return</div>
+              <div className="num" style={{ marginTop: 14, fontSize: 'clamp(64px,13vw,150px)', fontWeight: 400, color: 'var(--sage)', lineHeight: 0.9 }}>
+                <CountUp to={gain12} decimals={1} prefix="+" suffix="%" duration={1800} />
+              </div>
+              <p style={{ marginTop: 20, maxWidth: '34ch', fontSize: 15, color: 'var(--muted)', fontWeight: 300, lineHeight: 1.6 }}>
+                Across {months} documented months — {AGG.negatives} of them negative, kept on the record in full.
+              </p>
             </div>
+            <RecordStrip />
           </div>
-          <div className="pl-[56px] pr-3 py-10 md:pl-0 md:pr-0 md:py-0">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_56px_minmax(0,1fr)] md:gap-12">
-              {rows.map((r, idx) => (
-                <Fragment key={r.id}>
-                  <PathFadeIn>
-                    <PathTallImage mdH={r.leftMd} lgH={r.leftLg} imgSrc={r.imgSrc} imgAlt={r.imgAlt} padClass={r.padClass} priority={idx===0} />
-                  </PathFadeIn>
-                  <div ref={idx===0?gutterRef:undefined} />
-                  <PathFadeIn delay={0.06}>
-                    <PathRightCell mdH={r.leftMd} lgH={r.leftLg}>
-                      <PathFeatureGroup iconSrc={r.feature.iconSrc} title={r.feature.title} bullets={r.feature.bullets} />
-                    </PathRightCell>
-                  </PathFadeIn>
-                </Fragment>
+        </Reveal>
+
+        <Reveal delay={0.16} style={{ marginTop: 'clamp(40px,6vw,72px)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '18px 40px', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+            <div>
+              <a href="/join" className="btn btn-primary">Join the room — €79/mo</a>
+              <div className="cta-note">Cancel anytime · about 15 minutes a day</div>
+            </div>
+            <div style={{ display: 'flex', gap: 'clamp(24px,4vw,48px)' }}>
+              {[
+                { v: <CountUp to={avgWin} suffix="%" />, l: 'Avg win rate' },
+                { v: <CountUp to={totalTrades} separators />, l: 'Trades logged' },
+              ].map((s, i) => (
+                <div key={i}>
+                  <div className="kpi-value" style={{ fontSize: 'clamp(26px,3.6vw,38px)', color: 'var(--ink)' }}>{s.v}</div>
+                  <div className="kpi-label" style={{ marginTop: 10 }}>{s.l}</div>
+                </div>
               ))}
             </div>
           </div>
+        </Reveal>
+      </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .vc .vc-hero-figure{display:grid;gap:44px;align-items:end;}
+        @media(min-width:860px){ .vc .vc-hero-figure{grid-template-columns:.85fr 1.15fr;gap:64px;} }
+      ` }} />
+    </section>
+  );
+}
+
+// thin, airy bar strip — no chrome, just the shape of the record
+function RecordStrip() {
+  const { ordered, first, last, best, worst } = AGG;
+  return (
+    <figure style={{ margin: 0 }}>
+      <div style={{ position: 'relative', height: 128 }}>
+        <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: `${NEG_ZONE}%`, height: 1, background: 'var(--line)' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'stretch', gap: 3 }}>
+          {ordered.map((m, i) => {
+            const { neg, posH, negH } = barGeom(m, NEG_ZONE);
+            return (
+              <div key={`${m.year}-${m.month}`} style={{ position: 'relative', flex: 1, minWidth: 0 }} title={`${m.month} ${m.year}: ${fmtPct(m.gainPct)}`}>
+                {!neg && <div className="bar-fill" style={{ position: 'absolute', left: 0, right: 0, bottom: `${NEG_ZONE}%`, height: `${posH}%`, background: 'var(--sage)', opacity: 0.9, borderRadius: '3px 3px 0 0', transformOrigin: 'bottom', animation: 'vc-bar .6s cubic-bezier(.2,.7,.2,1) both', animationDelay: `${0.25 + i * 0.022}s` }} />}
+                {neg && <div className="bar-fill" style={{ position: 'absolute', left: 0, right: 0, top: `${100 - NEG_ZONE}%`, height: `${negH}%`, background: 'var(--clay)', borderRadius: '0 0 3px 3px', transformOrigin: 'top', animation: 'vc-bar .6s cubic-bezier(.2,.7,.2,1) both', animationDelay: `${0.25 + i * 0.022}s` }} />}
+              </div>
+            );
+          })}
         </div>
-        <div className="mt-8 flex justify-center">
-          <a href="/join" className="inline-flex w-full items-center justify-center px-8 py-4 text-sm font-semibold text-black shadow-xl transition hover:brightness-110 md:w-auto md:text-base" style={{ background: GOLD }}>Enroll Today</a>
-        </div>
+      </div>
+      <div className="num" style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14, fontSize: 11, color: 'var(--muted-dim)' }}>
+        <span>{MONTH_ABBR[first.month]} {first.year}</span>
+        <span>{MONTH_ABBR[last.month]} {last.year}</span>
+      </div>
+      <p style={{ marginTop: 18, fontSize: 13.5, color: 'var(--muted)', fontWeight: 300, lineHeight: 1.6 }}>
+        Best <span className="num" style={{ color: 'var(--sage)' }}>{fmtPct(best.gainPct)}</span>, worst <span className="num" style={{ color: 'var(--clay)' }}>{fmtPct(worst.gainPct)}</span>. One month in the record is a loss — shown, not removed.
+      </p>
+    </figure>
+  );
+}
+
+/* SCALE / SOCIAL PROOF */
+function ScaleSection() {
+  return (
+    <section className="sec">
+      <div className="wrap" style={{ textAlign: 'center' }}>
+        <Reveal>
+          <p className="eyebrow">The people behind the number</p>
+          <h2 className="sec-title" style={{ marginTop: 22, maxWidth: '18ch', marginInline: 'auto' }}>
+            Members have tracked over <span style={{ color: 'var(--sage)' }}>€<CountUp to={3.2} decimals={1} />M</span> in profit.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
+            {[1, 2, 3, 4].map((i) => <Image key={i} src={`/avatars/user${i}.webp`} alt="" width={44} height={44} loading="lazy" style={{ borderRadius: '50%', border: '3px solid var(--bg)', marginLeft: i === 1 ? 0 : -12 }} />)}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'clamp(32px,6vw,80px)', marginTop: 44 }}>
+            {[
+              { v: <CountUp to={10000} suffix="+" separators />, l: 'Students enrolled' },
+              { v: <CountUp to={5000} suffix="+" separators />, l: 'Active members' },
+              { v: <CountUp to={AGG.months} />, l: 'Months documented' },
+            ].map((s, i) => (
+              <div key={i}>
+                <div className="kpi-value" style={{ fontSize: 'clamp(30px,4.4vw,46px)', color: 'var(--ink)' }}>{s.v}</div>
+                <div className="kpi-label" style={{ marginTop: 12 }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ marginTop: 40, marginInline: 'auto', maxWidth: '46ch', fontSize: 14, color: 'var(--muted-dim)', fontWeight: 300 }}>
+            Screenshots shared by members. Individual results vary and are not typical or guaranteed.
+          </p>
+        </Reveal>
       </div>
     </section>
   );
 }
 
-function PathFadeIn({ children, delay=0 }: { children: ReactNode; delay?: number }) {
-  const ref = useRef<HTMLDivElement|null>(null); const [show, setShow] = useState(false);
-  useEffect(() => { const el=ref.current; if(!el) return; const io=new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting)setShow(true);},{threshold:0.2}); io.observe(el); return()=>io.disconnect(); }, []);
-  return <div ref={ref} className={show?"animate-[fadeSlideUp_.5s_ease_forwards]":"opacity-0"} style={{animationDelay:show?`${delay}s`:undefined}}>{children}</div>;
-}
-function PathRightCell({ children, mdH, lgH }: { children: ReactNode; mdH: number; lgH: number }) {
+/* PROCESS */
+function ProcessSection() {
   return (
-    <div className="flex">
-      <style dangerouslySetInnerHTML={{ __html:`@media(min-width:768px){.row-md-${mdH}{height:${mdH}px}}@media(min-width:1024px){.row-lg-${lgH}{height:${lgH}px}}` }} />
-      <div className={`row-md-${mdH} row-lg-${lgH} w-full flex items-center`}>{children}</div>
-    </div>
-  );
-}
-function PathTallImage({ mdH, lgH, imgSrc, imgAlt, padClass="p-3 md:p-4 lg:p-6", priority=false }: { mdH:number;lgH:number;imgSrc:string;imgAlt?:string;padClass?:string;priority?:boolean }) {
-  return (
-    <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#070A10]" style={{ boxShadow:"0 20px 60px rgba(0,0,0,.6)" }}>
-      <style dangerouslySetInnerHTML={{ __html:`@media(min-width:768px){.ph-md-${mdH}{height:${mdH}px}}@media(min-width:1024px){.ph-lg-${lgH}{height:${lgH}px}}` }} />
-      <div className={`ph-md-${mdH} ph-lg-${lgH} min-h-[260px] md:min-h-0 relative`}>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_300px_at_-10%_-20%,rgba(109,40,217,.10),transparent_60%)]" />
-        <div className={`absolute inset-0 flex items-center justify-center ${padClass}`}>
-          <Image src={imgSrc} alt={imgAlt??"feature"} fill className="object-contain pointer-events-none select-none" sizes="(min-width:1024px) 33vw, 90vw" priority={priority} />
+    <section id="process" className="sec">
+      <div className="wrap">
+        <Reveal><p className="eyebrow">How it works</p><h2 className="sec-title" style={{ marginTop: 20, maxWidth: '16ch' }}>Three steps. Nothing to interpret.</h2></Reveal>
+        <div style={{ marginTop: 'clamp(44px,6vw,72px)', display: 'grid', gap: 0 }}>
+          {STEPS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.08}>
+              <div className="vc-step" style={{ display: 'grid', gap: 'clamp(8px,3vw,40px)', padding: 'clamp(28px,4vw,44px) 0', borderTop: i === 0 ? '1px solid var(--line)' : '1px solid var(--line-soft)', alignItems: 'baseline' }}>
+                <span className="num" style={{ fontSize: 15, color: 'var(--muted-dim)' }}>{s.n}</span>
+                <h3 style={{ fontSize: 'clamp(24px,3.4vw,34px)', fontWeight: 300, letterSpacing: '-0.02em' }}>{s.title}</h3>
+                <p style={{ fontSize: 16, color: 'var(--muted)', fontWeight: 300, lineHeight: 1.65, maxWidth: '44ch' }}>{s.body}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
-    </div>
-  );
-}
-function PathFeatureGroup({ iconSrc, title, bullets }: { iconSrc:string; title:string; bullets:string[] }) {
-  return (
-    <div className="w-full md:max-w-[640px]">
-      <div className="mb-4 flex items-center gap-4">
-        <Image src={iconSrc} alt="" width={64} height={64} className="shrink-0 w-9 h-9 md:w-12 md:h-12 lg:w-14 lg:h-14" />
-        <h3 className="font-extrabold leading-tight headline-grad-dark text-[20px] md:text-[30px] lg:text-[36px] tracking-[-0.01em]">{title}</h3>
-      </div>
-      <div className="pill-row">
-        {bullets.map((b,i) => (
-          <div key={i} className="dark-pill">
-            <div className="pill-bullet">
-              <Image src="/tick.svg" alt="" width={20} height={20} className="mt-0.5 opacity-80 shrink-0" />
-              <span className="text-[14px] md:text-[15.5px] text-white/75 leading-snug">{b}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media(min-width:820px){ .vc .vc-step{grid-template-columns:60px 1fr 1.1fr;} }
+      ` }} />
+    </section>
   );
 }
 
-function StatsSection() {
-  const hasStats = Array.isArray(ALL_STATS) && ALL_STATS.length > 0;
-  const monthIndex = (m: string) => MONTH_ORDER.indexOf(m);
-  const ordered = hasStats ? [...ALL_STATS].sort((a,b)=>b.year-a.year||monthIndex(b.month)-monthIndex(a.month)) : [];
-  const lastTwo = ordered.slice(0,2);
-  const totalTrades = hasStats ? ALL_STATS.reduce((t,m)=>t+m.trades,0) : 0;
-  const totalRR = hasStats ? ALL_STATS.reduce((t,m)=>t+m.rr,0) : 0;
-  const avgWin = hasStats ? Math.round(ALL_STATS.reduce((t,m)=>t+m.winRatePct,0)/Math.max(1,ALL_STATS.length)) : 0;
-  const trailing12 = ordered.slice(0,12);
-  const gain12 = trailing12.length ? Math.round(trailing12.reduce((t,m)=>t+m.gainPct,0)*10)/10 : 0;
-  const years = Array.from(new Set(ordered.map(s=>s.year))).sort((a,b)=>b-a);
-  const [open, setOpen] = React.useState(false);
-  const [yearsShown, setYearsShown] = React.useState<number[]>(years.length?[years[0]]:[]);
-  const showNextYear = () => { const next=years.find(y=>!yearsShown.includes(y)); if(typeof next==="number") setYearsShown(ys=>[...ys,next].sort((a,b)=>b-a)); };
-  if (!hasStats) return null;
-
+/* SIGNAL FORMAT */
+function SignalSection() {
+  const rows: [string, string, string][] = [
+    ['Entry', '1.08420', 'var(--ink)'],
+    ['Stop-loss', '1.08080', 'var(--clay)'],
+    ['Take-profit 1', '1.08790', 'var(--sage)'],
+    ['Take-profit 2', '1.09150', 'var(--sage)'],
+    ['Take-profit 3', '1.09640', 'var(--sage)'],
+  ];
   return (
-    <section id="stats" className="relative bg-black py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(109,40,217,0.08),transparent_70%)]" />
-      <div className="relative mx-auto max-w-6xl px-6">
-        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-3">
-          <div className="md:col-span-2">
-            <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold tracking-[0.25em] uppercase text-white/60 mb-4">VERIFIED RESULTS</div>
-            <h2 className="text-4xl font-semibold leading-tight md:text-[44px] text-white">Consistency You Can Trust</h2>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-400">Track the performance of the Master Room over the years.</p>
-          </div>
-          <div className="rounded-[24px] border border-white/10 p-5" style={{ background:"linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03))", boxShadow:"0 10px 40px rgba(0,0,0,.4)" }}>
-            <div className="text-[11px] uppercase tracking-[0.28em] text-white/50">Trailing 12-Month Gain</div>
-            <div className="mt-2 text-[42px] font-black leading-none text-yellow-300">{gain12>=0?`+${gain12}%`:`${gain12}%`}</div>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <div className="rounded-lg border border-white/10 px-3 py-2" style={{ background:"rgba(255,255,255,.04)" }}><div className="text-[10px] uppercase tracking-[0.22em] text-white/50">Avg Win Rate</div><div className="mt-1 text-lg font-extrabold text-white">{avgWin}%</div></div>
-              <div className="rounded-lg border border-white/10 px-3 py-2" style={{ background:"rgba(255,255,255,.04)" }}><div className="text-[10px] uppercase tracking-[0.22em] text-white/50">Total Trades</div><div className="mt-1 text-lg font-extrabold text-white">{totalTrades.toLocaleString("en-US")}</div></div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {lastTwo.map((m,i) => (
-            <article key={`${m.year}-${m.month}`} className="rounded-3xl p-[1px]" style={{ background:`linear-gradient(135deg,${hexA('#8b5cf6',.30)},${hexA('#5b21b6',.40)})`, boxShadow:"0 10px 40px rgba(0,0,0,.5)" }}>
-              <div className="rounded-3xl border border-white/10 p-6" style={{ background:"linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03))" }}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="text-xs font-medium uppercase tracking-widest text-white/50">{m.month} {m.year}</div>
-                    <div className="mt-1 text-3xl font-black leading-tight text-white">{m.gainPct>=0?"+":""}{m.gainPct}%</div>
-                    <div className="mt-2 text-xs text-white/50">Monthly gain</div>
-                  </div>
-                  <span className="rounded-full px-2 py-1 text-[10px] font-semibold tracking-wide" style={{ color:i===0?"#0b0d11":"#fff", background:i===0?GOLD_SOLID:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.16)" }}>{i===0?"NEWEST":"RECENT"}</span>
+    <section id="signal" className="sec">
+      <div className="wrap">
+        <div className="vc-signal-grid">
+          <Reveal>
+            <p className="eyebrow">The product</p>
+            <h2 className="sec-title" style={{ marginTop: 20, maxWidth: '14ch' }}>This is exactly what you copy.</h2>
+            <p className="lede" style={{ marginTop: 26, maxWidth: '42ch' }}>
+              One plain format — a pair, a direction, and the exact levels. No commentary to interpret, nothing to guess.
+            </p>
+            <p className="num" style={{ marginTop: 28, fontSize: 13, color: 'var(--muted)' }}>Pairs traded: {PAIRS.join('  ·  ')}</p>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <figure style={{ margin: 0, background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden' }}>
+              <figcaption style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--line-soft)' }}>
+                <span className="num" style={{ fontSize: 11.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>Signal format</span>
+                <span className="num" style={{ fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--muted-dim)', border: '1px solid var(--line)', borderRadius: 999, padding: '4px 10px' }}>Example</span>
+              </figcaption>
+              <div style={{ padding: 'clamp(20px,3vw,28px)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span className="num" style={{ fontSize: 22 }}>EUR/USD</span>
+                  <span className="num" style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--sage)', border: '1px solid var(--sage)', borderRadius: 999, padding: '4px 11px' }}>BUY · LONG</span>
                 </div>
-                <div className="mt-6 grid grid-cols-3 gap-3">
-                  {[["Trades",m.trades,false],["Win rate",`${m.winRatePct}%`,true],["RR total",m.rr,false]].map(([label,value,accent])=>(
-                    <div key={String(label)} className="rounded-lg border border-white/10 p-3" style={{ background:accent?`linear-gradient(180deg,${hexA('#8b5cf6',.22)},${hexA('#5b21b6',.18)})`:"rgba(255,255,255,.04)" }}>
-                      <div className="text-[10px] uppercase tracking-[0.22em] text-white/55">{String(label)}</div>
-                      <div className="mt-1 text-lg font-extrabold text-white">{String(value)}</div>
+                <div style={{ marginTop: 22, display: 'grid', gap: 1, background: 'var(--line-soft)', border: '1px solid var(--line-soft)', borderRadius: 10, overflow: 'hidden' }}>
+                  {rows.map(([label, value, color]) => (
+                    <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'var(--surface)' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'var(--muted)', fontWeight: 300 }}><span style={{ height: 6, width: 6, borderRadius: '50%', background: color }} />{label}</span>
+                      <span className="num" style={{ fontSize: 16, color }}>{value}</span>
                     </div>
                   ))}
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {[["Total RR",`${totalRR} RR`],["Average Win Rate",`${avgWin}%`],["Trades Logged",totalTrades.toLocaleString("en-US")]].map(([label,value])=>(
-            <div key={String(label)} className="rounded-2xl border border-white/10 p-4" style={{ background:"rgba(255,255,255,.04)" }}>
-              <div className="text-[11px] uppercase tracking-widest text-white/50">{String(label)}</div>
-              <div className="mt-2 text-[24px] font-extrabold leading-none text-white">{String(value)}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-10 flex flex-col items-center gap-4 md:flex-row md:justify-center">
-          <a href="/join" className="inline-flex items-center justify-center px-8 py-3 text-sm font-semibold text-black transition hover:brightness-110" style={{ background: GOLD }}>Copy Our Trades — Start Today</a>
-          <button onClick={() => setOpen(v=>!v)} className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white transition border border-white/10 bg-white/5 hover:bg-white/10">{open?"Hide Detailed Stats":"Show Detailed Stats"}</button>
-        </div>
-        {open && (
-          <div className="mt-10">
-            {yearsShown.map(yr => {
-              const list = ordered.filter(s=>s.year===yr);
-              return (
-                <div key={yr} className="mt-8">
-                  <div className="mb-4 flex items-center gap-4"><h3 className="text-lg font-extrabold text-white">{yr} Breakdown</h3><div className="h-px flex-1 rounded-full bg-white/10" /></div>
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                    {list.map(m => (
-                      <div key={`${m.year}-${m.month}`} className="rounded-2xl border border-white/10 p-5" style={{ background:"rgba(255,255,255,.04)" }}>
-                        <div className="flex items-start justify-between">
-                          <div className="text-xs font-medium uppercase tracking-widest text-white/55">{m.month} {m.year}</div>
-                          <div className="rounded-full px-2 py-[2px] text-xs font-semibold text-white ring-1 ring-white/10 bg-white/5">{m.gainPct>=0?"+":""}{m.gainPct}%</div>
-                        </div>
-                        <div className="mt-4 grid grid-cols-3 gap-3">
-                          {[["Trades",m.trades,false],["Win%",`${m.winRatePct}%`,true],["RR",m.rr,false]].map(([label,value,accent])=>(
-                            <div key={String(label)} className="rounded-lg border border-white/10 p-2" style={{ background:accent?`linear-gradient(180deg,${hexA('#8b5cf6',.20)},${hexA('#5b21b6',.16)})`:"rgba(255,255,255,.04)" }}>
-                              <div className="text-[9px] uppercase tracking-[0.22em] text-white/55">{String(label)}</div>
-                              <div className="mt-1 text-sm font-extrabold text-white">{String(value)}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div style={{ marginTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="num" style={{ fontSize: 13, color: 'var(--muted)' }}>Risk-reward up to <span style={{ color: 'var(--ink)' }}>3.6R</span></span>
                 </div>
-              );
-            })}
-            <div className="mt-8 flex justify-center">
-              {years.some(y=>!yearsShown.includes(y)) ? (
-                <button onClick={showNextYear} className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white border border-white/10 bg-white/5 hover:bg-white/10 transition">Show Next Year</button>
-              ) : <p className="text-center text-xs text-white/40">End of history.</p>}
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function PairsSection() {
-  const items = [
-    { key:'eurusd', title:'EUR/USD', blurb:'Deep liquidity, tight spreads — clean structure through London and New York.', img:'/pairs/eurusd.webp' },
-    { key:'eurchf', title:'EUR/CHF', blurb:'High volatility with sharp session moves — respect levels, expect speed.', img:'/pairs/eurchf.webp' },
-    { key:'euraud', title:'EUR/AUD', blurb:'Range-prone cross — confluence and mean reversion show up day after day.', img:'/pairs/euraud.webp' },
-    { key:'audusd', title:'AUD/USD', blurb:'Commodity-tied flows — clean trends in Asia, risk sentiment drives momentum.', img:'/pairs/audusd.webp' },
-    { key:'eurjpy', title:'EUR/JPY', blurb:'Momentum-heavy — breaks and runs around session opens; manage speed and pullbacks.', img:'/pairs/eurjpy.webp' },
-    { key:'comingsoon', title:'Coming Soon', blurb:'New pairs are coming soon to the Master Room — stay tuned.', img:'/pairs/coming-soon.webp' },
-  ];
-  const PER_PAGE=3, [page, setPage] = useState(0);
-  const totalPages = Math.ceil(items.length/PER_PAGE);
-  const view = items.slice(page*PER_PAGE, page*PER_PAGE+PER_PAGE);
-  return (
-    <section id="pairs" className="relative bg-black py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(109,40,217,0.10),transparent_60%)]" />
-      <div className="relative mx-auto max-w-6xl px-6">
-        <div className="text-center mb-2"><div className="mx-auto inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold tracking-[0.25em] uppercase text-white/50">PAIRS WE TRADE</div></div>
-        <h2 className="mt-3 text-center text-3xl font-semibold text-white md:text-5xl">Pairs We Trade Daily</h2>
-        <div className="relative mt-8">
-          <button type="button" aria-label="Previous" onClick={()=>setPage(p=>Math.max(0,p-1))} disabled={page===0} className={`absolute left-2 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/5 p-2 text-white md:flex ${page===0?'opacity-30 cursor-not-allowed':'hover:bg-white/10'}`}>‹</button>
-          <button type="button" aria-label="Next" onClick={()=>setPage(p=>Math.min(totalPages-1,p+1))} disabled={page===totalPages-1} className={`absolute right-2 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/5 p-2 text-white md:flex ${page===totalPages-1?'opacity-30 cursor-not-allowed':'hover:bg-white/10'}`}>›</button>
-          <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {view.map(it => (
-              <article key={it.key} className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#070A10] transition hover:-translate-y-0.5" style={{ boxShadow:"0 20px 60px rgba(0,0,0,.5)" }}>
-                <div className="relative w-full overflow-hidden rounded-t-[28px] h-56 md:h-64">
-                  {it.img && <Image src={it.img} alt={it.title} fill sizes="(max-width:768px) 320px,420px" className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" priority={it.key==='eurusd'} />}
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),transparent_30%,transparent_70%,rgba(0,0,0,0.4))]" />
-                </div>
-                <div className="space-y-2 p-5"><h3 className="text-xl font-extrabold text-white">{it.title}</h3><p className="text-sm leading-6 text-zinc-400">{it.blurb}</p></div>
-              </article>
-            ))}
-          </div>
-          <div className="mt-6 flex justify-center gap-2">
-            {Array.from({length:totalPages}).map((_,k) => (
-              <button key={k} type="button" onClick={()=>setPage(k)} aria-label={`Page ${k+1}`} className={`h-[8px] w-8 rounded-full transition ${page===k?'bg-yellow-300':'bg-white/20 hover:bg-white/35'}`} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ProgramSlices() {
-  return (
-    <section id="program-slices" className="relative w-full bg-black">
-      <DarkBand imageSide="right" imageSrc="/SEC1.webp" imgRatio={0.64} title="Start Making Money Trading" bullets={['Copy signals with entry, stop, and targets.','Clear management: partials, breakeven, risk management.','No experience required — follow the plan and execute.']} />
-      <DarkBand imageSide="left" imageSrc="/SEC2.webp" imgRatio={0.82} imgGap="md:mr-20" title="Earn While You Learn" bullets={['Daily updates so you always know the plan.','Adjustments posted as price develops — no second-guessing.','Learn the strategy as you execute it, step by step.']} />
-      <DarkBand imageSide="right" imageSrc="/SEC3.webp" imgRatio={0.64} title="Access To Multi-Millionaires" bullets={['Mentors are hyper-successful experts in the trading field.','Get mentored every step of your journey.','24/7 live support from the team.']} />
-    </section>
-  );
-}
-
-function DarkBand({ imageSide, imageSrc, imgRatio=0.7, title, bullets, imgGap }: { imageSide:'left'|'right'; imageSrc:string; imgRatio?:number; title:string; bullets:string[]; imgGap?:string }) {
-  const gapClass = imgGap ?? (imageSide==='left'?'md:mr-16':'md:ml-16');
-  const imgCol = imageSide==='left'?'md:col-start-1':'md:col-start-2';
-  const copyCol = imageSide==='left'?'md:col-start-2':'md:col-start-1';
-  const W=560, H=Math.round(W*imgRatio);
-  return (
-    <div className="my-6 md:my-8">
-      <div className="relative overflow-hidden border-y border-white/[0.05]" style={{ background:"#070A10" }}>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_400px_at_50%_50%,rgba(109,40,217,.07),transparent_65%)]" />
-        <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 pt-14 pb-14 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-12 md:px-8 md:pt-12 md:pb-12">
-          <div className={`order-1 self-center ${imgCol} md:row-start-1 md:order-none`}>
-            <div className={`mb-2 flex justify-center md:mb-0 ${imageSide==='left'?'md:justify-self-start':'md:justify-self-end'} ${gapClass}`}>
-              <Image src={imageSrc} alt="" width={W} height={H} sizes="(min-width:1024px) 44vw,(min-width:768px) 50vw,92vw" className="block h-auto w-[min(560px,92vw)] object-contain md:w-[min(560px,44vw)] drop-shadow-[0_28px_56px_rgba(0,0,0,.7)]" />
-            </div>
-          </div>
-          <div className={`order-2 self-center ${copyCol} md:row-start-1 md:order-none`}>
-            <div className="relative z-10 min-w-0">
-              <h3 className="font-semibold tracking-tight text-white" style={{ fontSize:"clamp(28px,6.2vw,60px)", lineHeight:1.08, letterSpacing:"-0.02em" }}>{title}</h3>
-              <ul className="mt-6 space-y-4 text-[15.5px] leading-[1.75] md:text-[17px]">
-                {bullets.map((b,i) => (
-                  <li key={i} className="flex max-w-[64ch] items-start gap-2.5 text-zinc-400">
-                    <svg aria-hidden className="mt-[6px] h-4 w-4 flex-none text-zinc-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414l2.293 2.293 6.543-6.543a1 1 0 011.414 0z" /></svg>
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href="/join" className="mt-8 inline-flex w-full items-center justify-center px-6 py-4 text-sm font-semibold text-black transition hover:brightness-105 md:w-auto md:text-base" style={{ background: GOLD }}>Enroll Today</a>
-              <div className="h-6 md:hidden" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ChoosePathSection() {
-  return (
-    <section id="pricing" className="relative bg-black py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_left,rgba(168,85,247,0.14),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(253,224,71,0.10),transparent_55%)]" />
-      </div>
-      <div className="relative mx-auto max-w-6xl px-6">
-        <div className="text-center mb-2"><div className="mx-auto inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold tracking-[0.25em] uppercase text-white/50">CHOOSE YOUR PATH</div></div>
-        <h2 className="mt-3 text-center text-3xl font-semibold text-white md:text-5xl">Two Paths Lie Before You</h2>
-        <div className="mx-auto mt-5 flex max-w-3xl items-center">
-          <div className="h-px flex-1 rounded-full bg-white/10" /><div className="mx-3 h-3 w-3 rounded-full bg-yellow-300 shadow-[0_0_18px_rgba(253,224,71,0.9)]" aria-hidden /><div className="h-px flex-1 rounded-full bg-white/10" />
-        </div>
-        <div className="relative mt-12 grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1fr_auto_1fr]">
-          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#070A10] p-8 md:p-10" style={{ clipPath:'polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,0 100%)' }}>
-            <div className="pointer-events-none absolute -top-24 left-[-140px] h-72 w-72 rounded-full bg-purple-500/8 blur-3xl" />
-            <div className="relative">
-              <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold tracking-[0.25em] uppercase text-white/50">PAY</div>
-              <div className="mt-2 text-4xl font-semibold text-white md:text-[44px]">$10,000+</div>
-              <p className="mt-4 text-base leading-7 text-zinc-400">Waste years on BS courses, fake gurus, and losing signal rooms. All theory. No results. Keep guessing while your account bleeds.</p>
-              <a href="https://youtu.be/yPP5bD8xVhg?si=yikOvbBGLPGCXAEA&t=7" target="_blank" rel="noopener noreferrer" className="mt-6 inline-block rounded-[16px] border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/70 transition hover:bg-white/10">Keep Losing</a>
-            </div>
-          </div>
-          <div className="hidden items-center justify-center md:flex"><div className="flex h-16 w-16 items-center justify-center rounded-full text-sm font-bold text-white border border-white/10 bg-white/5">VS</div></div>
-          <div className="relative overflow-hidden rounded-[34px] p-[1.5px] shadow-[0_20px_60px_rgba(253,224,71,0.12)]" style={{ background:"linear-gradient(135deg,rgba(109,40,217,.9),rgba(167,139,250,.9) 40%,rgba(253,224,71,.8))", clipPath:'polygon(28px 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%,0 28px)' }}>
-            <div className="rounded-[33px] bg-[#0d1020] p-8 md:p-10 h-full">
-              <div className="inline-flex items-center rounded-full border border-yellow-300/25 bg-yellow-300/10 px-3 py-1 text-[11px] font-semibold tracking-[0.25em] uppercase text-yellow-200">PAY</div>
-              <div className="mt-2 text-4xl font-semibold text-white md:text-[44px]">€79 / month</div>
-              <p className="mt-4 text-base leading-7 text-white/80">Copy signals with entry, stop, and targets. Learn a system with years of proof. Weekly live calls for clarity. <span className="text-white font-bold">Your only job: execute.</span></p>
-              <a href="/join" className="mt-6 inline-flex items-center justify-center rounded-[16px] px-6 py-3 text-sm font-semibold text-black transition hover:brightness-105" style={{ background: GOLD }}>Start Earning</a>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px]">
-                <span className="h-2 w-2 rounded-full bg-green-400" /><span className="font-medium text-white/80">Cancel anytime</span>
+                <p className="num" style={{ margin: '20px 0 0', fontSize: 11, color: 'var(--muted-dim)', lineHeight: 1.5, fontWeight: 400 }}>Illustrative example of the signal format. Not a live or past trade.</p>
               </div>
+            </figure>
+          </Reveal>
+        </div>
+      </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .vc .vc-signal-grid{display:grid;gap:48px;align-items:center;}
+        @media(min-width:900px){ .vc .vc-signal-grid{grid-template-columns:1fr 1fr;gap:72px;} }
+      ` }} />
+    </section>
+  );
+}
+
+/* TESTIMONIALS */
+function ReviewsSection() {
+  return (
+    <section id="reviews" className="sec">
+      <div className="wrap">
+        <Reveal><p className="eyebrow">Member results</p><h2 className="sec-title" style={{ marginTop: 20, maxWidth: '20ch' }}>Screenshots from traders following the same signals.</h2></Reveal>
+        <Reveal delay={0.08}>
+          <div style={{ position: 'relative', height: 460, overflow: 'hidden', marginTop: 'clamp(36px,5vw,56px)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, height: '100%' }}>
+              <MarqueeCol dir="up" images={COLUMN_IMAGES[0]} />
+              <MarqueeCol dir="down" images={COLUMN_IMAGES[1]} />
+              <MarqueeCol dir="up" images={COLUMN_IMAGES[2]} />
             </div>
+            <div aria-hidden style={{ pointerEvents: 'none', position: 'absolute', insetInline: 0, top: 0, height: 90, background: 'linear-gradient(var(--bg),transparent)' }} />
+            <div aria-hidden style={{ pointerEvents: 'none', position: 'absolute', insetInline: 0, bottom: 0, height: 90, background: 'linear-gradient(0deg,var(--bg),transparent)' }} />
           </div>
-        </div>
-        <div className="mx-auto mt-6 max-w-3xl text-center text-[13px] text-white/35">Access all pairs, weekly Q&amp;A, and the Master Room archive.</div>
+          <p style={{ marginTop: 24, fontSize: 13.5, color: 'var(--muted-dim)', fontWeight: 300 }}>Results shared by individual members. Not typical, not guaranteed, and dependent on each person&apos;s execution.</p>
+        </Reveal>
       </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .vc .vc-col{display:flex;flex-direction:column;gap:14px;}
+        .vc .vc-up{animation:vc-mq-up 46s linear infinite;} .vc .vc-down{animation:vc-mq-down 46s linear infinite;}
+        @keyframes vc-mq-up{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+        @keyframes vc-mq-down{0%{transform:translateY(-50%)}100%{transform:translateY(0)}}
+        @media (prefers-reduced-motion: reduce){ .vc .vc-up,.vc .vc-down{animation:none;} }
+      ` }} />
     </section>
   );
 }
 
-function StudentWinsSection() {
+function MarqueeCol({ dir, images }: { dir: 'up' | 'down'; images: string[] }) {
+  const loop = [...images, ...images];
   return (
-    <section id="reviews" className="bg-black py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-4 py-0">
-        <div className="mx-auto max-w-5xl text-center">
-          <h2 className="text-3xl font-semibold leading-tight sm:text-4xl md:text-[40px] md:leading-tight">
-            Over{" "}<span className="text-yellow-300">€3.2M in Tracked Profits</span>{" "}From Traders Who Joined The Master Room.
-          </h2>
-        </div>
-        <div className="mx-auto mt-10 max-w-5xl relative h-[460px] overflow-hidden">
-          <div className="marquee-container grid h-full grid-cols-3 gap-3 sm:gap-5">
-            <TestimonialColumn direction="up" images={COLUMN_IMAGES[0]} />
-            <TestimonialColumn direction="down" images={COLUMN_IMAGES[1]} />
-            <TestimonialColumn direction="up" images={COLUMN_IMAGES[2]} />
-          </div>
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black via-black/70 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black via-black/70 to-transparent" />
-        </div>
-        <div className="mx-auto mt-10 max-w-3xl text-center text-base text-zinc-200 md:text-lg">
-          <p className="mb-5">These are regular traders who joined the master room and generated{" "}<span className="font-semibold text-yellow-300">over €3.2 million in profits.</span></p>
-        </div>
-        <div className="mt-8 flex justify-center">
-          <a href="/join" className="inline-flex items-center justify-center rounded-full px-14 py-4 text-sm font-semibold uppercase tracking-wide text-black shadow-xl transition hover:brightness-110 md:text-base" style={{ background: "linear-gradient(135deg, #fef9c3, #fde047, #fbbf24)" }}>Enroll Today</a>
-        </div>
-      </div>
-      <style jsx global>{`
-        .marquee-container { position: relative; height: 100%; }
-        .marquee-column { display: flex; flex-direction: column; gap: 1rem; }
-        .marquee-up   { animation: marquee-up   40s linear infinite; }
-        .marquee-down { animation: marquee-down 40s linear infinite; }
-        @keyframes marquee-up   { 0% { transform: translateY(0); }    100% { transform: translateY(-50%); } }
-        @keyframes marquee-down { 0% { transform: translateY(-50%); } 100% { transform: translateY(0); }    }
-      `}</style>
-    </section>
-  );
-}
-
-function TestimonialColumn({ direction, images }: { direction: "up" | "down"; images: string[] }) {
-  const loopImages = [...images, ...images];
-  return (
-    <div className="relative">
-      <div className={`marquee-column ${direction === "up" ? "marquee-up" : "marquee-down"}`}>
-        {loopImages.map((src, idx) => (
-          <div key={`${src}-${idx}`} className="overflow-hidden rounded-[20px] border border-slate-800 bg-black/70">
-            <Image src={src} alt="Student result" width={400} height={260} className="h-auto w-full object-cover" />
+    <div style={{ overflow: 'hidden' }}>
+      <div className={`vc-col ${dir === 'up' ? 'vc-up' : 'vc-down'}`}>
+        {loop.map((src, i) => (
+          <div key={`${src}-${i}`} style={{ overflow: 'hidden', borderRadius: 12, background: 'var(--surface)', border: '1px solid var(--line)' }}>
+            <Image src={src} alt="Member result" width={400} height={260} loading="lazy" style={{ height: 'auto', width: '100%', objectFit: 'cover' }} />
           </div>
         ))}
       </div>
@@ -814,112 +377,66 @@ function TestimonialColumn({ direction, images }: { direction: "up" | "down"; im
   );
 }
 
-function FaqSection() {
-  const faqs = [
-    { q:'Is the Master Room suitable for beginners?', a:'Yes. Even with zero experience. We give exact instructions—entries, stop-loss, targets and management—to copy inside the room. Follow the step-by-step guide and start making money.' },
-    { q:'Do I need a big account to start?', a:'No. You can start small and scale. Returns can be compounded, and many members grow further with prop-firm funding once consistent.' },
-    { q:'How fast can I see results?', a:'Most members start to profit within hours. Follow the instructions and you\'ll do the same.' },
-    { q:'Does my age matter?', a:'No. If you can use a phone or computer, you can execute the trades. If you are under 18, please consult a parent or guardian before signing up.' },
-    { q:'I don\'t have much time. Can I still join?', a:'Yes. You can copy signals manually in about 15 minutes a day, or use a trade copier to automate execution end-to-end.' },
-    { q:'I live in X country. Is that a problem?', a:'Not at all. We trade global Forex pairs online, so location doesn\'t matter.' },
-    { q:'Can I cancel anytime?', a:'Yes—absolutely. No lock-in. You can manage or cancel your subscription from your account page.' },
-    { q:'Still have questions?', a:'Reach out to the Range support team and ask anything—we\'ll get back to you ASAP.' },
-  ];
+/* PRICING + FAQ */
+function PricingSection() {
   return (
-    <section id="faq" className="relative bg-black pt-24 pb-0 md:pt-28">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_left,rgba(59,130,246,.07),transparent_60%)]" />
-      <div className="relative mx-auto max-w-6xl px-6">
-        <div className="mb-16 overflow-hidden rounded-[34px] border border-purple-900/40" style={{ background:"linear-gradient(135deg, #130b24 0%, #0d0818 50%, #0b0a14 100%)", boxShadow:"inset 0 1px 0 rgba(139,92,246,.15), inset 0 0 60px rgba(109,40,217,.10), 0 20px 60px rgba(0,0,0,.5)" }}>
-          <div className="flex flex-col items-center gap-4 px-6 py-10 text-center md:flex-row md:justify-between md:px-10">
-            <h3 className="text-2xl font-semibold text-white md:text-4xl">This Is Your Moment — Act On It</h3>
-            <div className="flex items-center gap-3 shrink-0">
-              <a href="/join" className="px-6 py-3 text-sm font-semibold text-black transition hover:brightness-105" style={{ background: GOLD }}>Enroll Today</a>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/80"><span className="h-2 w-2 rounded-full bg-green-400" />Limited Spaces Left</span>
+    <section id="pricing" className="sec">
+      <div className="wrap" style={{ textAlign: 'center' }}>
+        <Reveal>
+          <p className="eyebrow">Membership</p>
+          <div className="num" style={{ marginTop: 24, fontSize: 'clamp(56px,11vw,120px)', fontWeight: 400, letterSpacing: '-0.04em', lineHeight: 0.9 }}>€79</div>
+          <p className="lede" style={{ marginTop: 20 }}>per month · cancel anytime</p>
+          <div style={{ marginTop: 34 }}>
+            <a href="/join" className="btn btn-primary" style={{ padding: '17px 40px', fontSize: 16 }}>Join the room</a>
+            <div className="cta-note">Daily signals, live management, weekly Q&amp;A, and the full trade archive.</div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.08}>
+          <div style={{ marginTop: 'clamp(60px,9vw,110px)', textAlign: 'left', maxWidth: 760, marginInline: 'auto' }}>
+            <h3 className="num" style={{ fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)' }}>Common questions</h3>
+            <div style={{ marginTop: 8 }}>
+              {FAQS.map((f, i) => <Faq key={f.q} q={f.q} a={f.a} first={i === 0} />)}
             </div>
           </div>
-        </div>
-        <div className="mb-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-zinc-500">FREQUENTLY ASKED QUESTIONS</p>
-          <h2 className="mt-2 text-3xl font-semibold text-white md:text-5xl">Frequently Asked Questions</h2>
-        </div>
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1fr_1.25fr]">
-          <div className="order-1 space-y-4 md:order-none md:col-start-2 md:row-span-2">
-            {faqs.map((item,idx) => <FaqAccordion key={idx} index={idx+1} q={item.q} a={item.a} />)}
-          </div>
-          <div className="order-2 overflow-hidden rounded-[24px] border border-purple-900/40 p-6 text-white md:order-none md:col-start-1 md:row-start-2" style={{ background:"linear-gradient(160deg, #1a0f2e 0%, #100a1f 60%, #0d0818 100%)", boxShadow:"inset 0 0 40px rgba(109,40,217,.10)" }}>
-            <div className="text-lg font-semibold text-white">Questions not covered?</div>
-            <p className="mt-1 text-sm text-white/55">Tap the support bot in the bottom-right corner and we&apos;ll help you out.</p>
-            <a href="https://t.me/rangesupportfx" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block px-4 py-2 text-sm font-semibold text-black transition hover:brightness-105" style={{ background: GOLD }}>Open Telegram Support</a>
-          </div>
-          <div className="order-3 relative overflow-hidden rounded-[24px] border border-white/10 bg-[#070A10] p-6 md:order-none md:col-start-1 md:row-start-1">
-            <div className="pointer-events-none absolute -right-6 -top-6 opacity-[0.04]"><Image src="/mr-logo.webp" alt="" width={120} height={120} /></div>
-            <p className="text-base leading-7 text-zinc-400">Everything taught inside <span className="text-white font-semibold">MASTER ROOM</span> is for educational purposes only. Implementation and results depend on each member&apos;s execution and risk control.</p>
-            <p className="mt-4 text-base leading-7 text-zinc-400">We do not guarantee profits or financial success. Trade responsibly and never risk funds you cannot afford to lose.</p>
-            <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-              <a href="/terms" className="underline underline-offset-2 hover:text-white">Terms &amp; Conditions</a><span>•</span><a href="/privacy" className="underline underline-offset-2 hover:text-white">Privacy Policy</a>
-            </div>
-            <div className="mt-3 text-sm text-zinc-500">Support: <a href="https://t.me/rangesupportfx" target="_blank" rel="noopener noreferrer" className="font-semibold text-zinc-300 underline">Range Support Team</a></div>
-          </div>
-        </div>
+        </Reveal>
       </div>
-      <SiteFooter />
     </section>
   );
 }
 
-function FaqAccordion({ index, q, a }: { index:number; q:string; a:string }) {
+function Faq({ q, a, first }: { q: string; a: string; first: boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <article className="overflow-hidden rounded-[20px] border border-white/10 bg-[#070A10] transition hover:bg-[#0b0f18]">
-      <div className="flex">
-        <div className="hidden w-14 items-center justify-center border-r border-white/10 md:flex" style={{ background:"linear-gradient(180deg,rgba(109,40,217,.85),rgba(91,33,182,.9))" }}>
-          <span className="select-none font-extrabold text-white/90 text-[20px]">{index}</span>
-        </div>
-        <button type="button" onClick={() => setOpen(v=>!v)} className="flex w-full items-center gap-4 px-5 py-5 text-left md:pl-6">
-          <span className="flex-1 text-[15.5px] font-semibold text-white">{q}</span>
-          <span className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5">
-            <svg className="h-4 w-4 text-white/60" style={{ transform:open?'rotate(45deg)':'rotate(0deg)', transition:'transform .2s' }} viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" /></svg>
-          </span>
-        </button>
+    <div style={{ borderTop: first ? 'none' : '1px solid var(--line-soft)' }}>
+      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
+        style={{ display: 'flex', width: '100%', alignItems: 'center', gap: 16, padding: '22px 0', background: 'transparent', border: 0, textAlign: 'left', color: 'var(--ink)', cursor: 'pointer' }}>
+        <span style={{ flex: 1, fontSize: 'clamp(17px,2vw,20px)', fontWeight: 300 }}>{q}</span>
+        <span aria-hidden style={{ color: 'var(--muted)', transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .2s' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M12 5v14M5 12h14" /></svg></span>
+      </button>
+      <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows .28s ease' }}>
+        <div style={{ overflow: 'hidden' }}><p style={{ margin: 0, padding: '0 0 24px', fontSize: 16, lineHeight: 1.7, color: 'var(--muted)', fontWeight: 300, maxWidth: '58ch' }}>{a}</p></div>
       </div>
-      <div className="grid" style={{ gridTemplateRows:open?'1fr':'0fr', transition:'grid-template-rows .3s ease' }}>
-        <div className="overflow-hidden"><div className="border-t border-white/[0.08] px-5 py-4 text-[15px] leading-7 text-zinc-400 md:pl-20">{a}</div></div>
-      </div>
-    </article>
+    </div>
   );
 }
 
-function SiteFooter() {
+/* FOOTER + DISCLAIMER */
+function Footer() {
   return (
-    <footer className="mt-24 md:mt-32 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen bg-black py-14">
-      <div className="mx-auto max-w-5xl px-6 text-center text-sm text-zinc-500">
-        <div className="mb-6 flex justify-center">
-          <div className="rounded-xl border border-white/10 bg-[#070A10] shadow-[0_10px_34px_rgba(0,0,0,.5)] p-2">
-            <Image src="/mr-footer.webp" alt="Master Room" width={70} height={70} className="block rounded-lg" />
+    <footer style={{ borderTop: '1px solid var(--line)' }}>
+      <div className="wrap" style={{ paddingBlock: 'clamp(48px,7vw,80px)' }}>
+        <p style={{ margin: '0 auto', maxWidth: '64ch', textAlign: 'center', fontSize: 14, lineHeight: 1.8, color: 'var(--muted)', fontWeight: 300 }}>
+          Everything shared by Range Universe is for educational purposes only. The monthly record above is a log of past results, including losses; past performance does not guarantee future results, and outcomes depend on each member&apos;s own execution and risk control. Never risk funds you cannot afford to lose.
+        </p>
+        <div style={{ marginTop: 44, paddingTop: 28, borderTop: '1px solid var(--line-soft)', display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
+          <span className="num" style={{ fontSize: 11, color: 'var(--muted-dim)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Range Universe</span>
+          <div style={{ display: 'flex', gap: 18, fontSize: 14, color: 'var(--muted)', fontWeight: 300 }}>
+            <a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href={TELEGRAM_SUPPORT} target="_blank" rel="noopener noreferrer">Support</a>
           </div>
+          <span style={{ fontSize: 13, color: 'var(--muted-dim)', fontWeight: 300 }}>© 2026</span>
         </div>
-        <div className="mb-4 flex justify-center gap-4">
-          <a href="/privacy" className="hover:text-white transition">Privacy Policy</a><span>•</span><a href="/terms" className="hover:text-white transition">Terms &amp; Conditions</a>
-        </div>
-        <p className="text-xs text-zinc-600">© 2026 Range Universe. All rights reserved.</p>
       </div>
     </footer>
-  );
-}
-
-function FloatingActions() {
-  return (
-    <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3">
-      <a href="/join" className="hidden sm:inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-semibold text-black transition hover:brightness-105 active:translate-y-[1px]" style={{ background: GOLD, boxShadow:"0 8px 24px rgba(253,224,71,.25)" }}>Enroll Today</a>
-      <a href="https://t.me/rangesupportfx" target="_blank" rel="noopener noreferrer" aria-label="Open Support Chat" className="relative grid h-12 w-12 place-items-center rounded-full transition hover:scale-[1.05]" style={{ background:`linear-gradient(135deg,${BRAND.PURPLE} 0%,${BRAND.PURPLE_DARK} 100%)`, border:"1px solid rgba(255,255,255,.14)", boxShadow:`0 14px 28px ${hexA(BRAND.PURPLE,.35)},inset 0 1px 0 rgba(255,255,255,0.12)` }}>
-        <svg viewBox="0 0 48 48" width="24" height="24" aria-hidden className="relative">
-          <path d="M24 6C13.5 6 5 13.6 5 23c0 3.3 1 6.5 3 9.2.4.6.5 1.4.4 2.1l-1.2 4.9c-.3 1.2.8 2.3 2 2l5-1.5c.7-.2 1.5-.3 2.2-.1 2.3.7 4.9 1.1 7.6 1.1 10.5 0 19-7.6 19-17S34.5 6 24 6Z" fill={hexA('#000',.12)} />
-          <path d="M24 8C14.6 8 7 15 7 23.8c0 3 .9 5.9 2.7 8.3.5.7.7 1.6.5 2.5l-.9 3.9 4-1.2c.9-.3 1.8-.3 2.7 0 2.2.7 4.6 1 7 1 9.4 0 17-6.9 17-15.5S33.4 8 24 8Z" fill="url(#mrBg)" />
-          <defs><linearGradient id="mrBg" x1="10" y1="6" x2="40" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor={BRAND.PURPLE_LIGHT} /><stop offset="1" stopColor={BRAND.PURPLE_DARK} /></linearGradient></defs>
-          <path d="M24 29v-1.2c0-2.2 1.4-3.4 3-4.3 1.6-.9 3-1.9 3-3.8 0-2.7-2.4-4.6-5.6-4.6-3 0-5 1.3-5.9 3.6" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-          <circle cx="24" cy="34" r="2.2" fill="#ffffff" />
-        </svg>
-      </a>
-    </div>
   );
 }
