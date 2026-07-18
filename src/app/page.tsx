@@ -15,7 +15,7 @@ const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], displa
 const NAV = [['Record', '#record'], ['Process', '#process'], ['Signal', '#signal'], ['Reviews', '#reviews'], ['Pricing', '#pricing']];
 const NEG_ZONE = 22;
 
-// Every CTA hands off straight to the Telegram bot — no on-site checkout.
+// Every CTA hands off straight to the Telegram bot — the site sells nothing itself.
 const TELEGRAM_BOT = 'https://t.me/rangefx_bot?start=website';
 
 export default function VariantC() {

@@ -32,8 +32,9 @@ to `/` (it was promoted to the homepage). `/mr*` redirects to the homepage.
 ## Sign-ups
 
 Every "Join the room" CTA links straight to the Telegram bot
-(`https://t.me/rangefx_bot?start=website`). There is no on-site checkout,
-payment, auth, or database integration in this codebase.
+(`https://t.me/rangefx_bot?start=website`). The site is a static informational
+funnel — no payments, accounts, or database run in this codebase; anything
+transactional happens inside the bot.
 
 ## Environment
 
