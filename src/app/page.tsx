@@ -220,7 +220,7 @@ function RecordStrip() {
 /* SCALE / SOCIAL PROOF */
 function ScaleSection() {
   return (
-    <section className="sec">
+    <section id="record" className="sec">
       <div className="wrap" style={{ textAlign: 'center' }}>
         <Reveal>
           <p className="eyebrow">The people behind the number</p>
