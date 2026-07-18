@@ -54,11 +54,6 @@ export default function PrivacyPage() {
               status, and settings.
             </LI>
             <LI>
-              <b>Billing</b>: transactions processed by our commerce partner{" "}
-              <b>Whop</b> (and, as selected, PayPal or card gateways). We do not
-              store full payment details on our servers.
-            </LI>
-            <LI>
               <b>Usage</b>: pages viewed, actions taken, device information, IP,
               general location, and similar analytics.
             </LI>
@@ -72,12 +67,11 @@ export default function PrivacyPage() {
         <LSection title="How We Use Information">
           <UL>
             <LI>Provide and maintain the Service and your membership.</LI>
-            <LI>Process payments, invoices, and applicable taxes (e.g., VAT).</LI>
             <LI>Operate community/features; prevent fraud and abuse.</LI>
             <LI>
               Improve Site performance and content (analytics and diagnostics).
             </LI>
-            <LI>Send transactional emails and updates about your account.</LI>
+            <LI>Send service and membership updates, and respond to your requests.</LI>
             <LI>Comply with legal obligations.</LI>
           </UL>
         </LSection>
@@ -104,8 +98,8 @@ export default function PrivacyPage() {
           <P>We share personal data with:</P>
           <UL>
             <LI>
-              <b>Service providers</b> (hosting, analytics, communications,
-              payments, fraud prevention) under contracts limiting use to our
+              <b>Service providers</b> (hosting, analytics, communications, and
+              abuse prevention) under contracts limiting use to our
               instructions.
             </LI>
             <LI>
@@ -118,9 +112,8 @@ export default function PrivacyPage() {
             </LI>
           </UL>
           <P className="mt-2">
-            Examples include Vercel (hosting), Google (analytics) and payment
-            platforms (e.g., Whop and PayPal). Their terms and privacy notices
-            apply to their services.
+            Examples include Vercel (hosting) and Google (analytics). Their
+            terms and privacy notices apply to their services.
           </P>
         </LSection>
 

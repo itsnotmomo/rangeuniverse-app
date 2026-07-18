@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms & Conditions — Range Universe",
   description:
-    "Terms & Conditions for Range Universe FZ-LLC — membership, payments, use rules, IP, and legal.",
+    "Terms & Conditions for Range Universe FZ-LLC — membership, use rules, IP, and legal.",
 };
 
 const UPDATED = "04 Oct 2025";
@@ -83,42 +83,24 @@ export default function TermsPage() {
           </UL>
         </Section>
 
-        <Section title="Membership, Billing & Taxes">
-          <UL>
-            <LI>
-              Subscriptions are billed by our commerce partner{" "}
-              <b>Whop</b>. Payment methods offered at checkout currently include
-              card and PayPal. Prices and available methods may change.
-            </LI>
-            <LI>
-              Subscriptions renew automatically until cancelled. You can manage
-              or cancel your membership from your Whop portal or the link we
-              provide in your account emails.
-            </LI>
-            <LI>
-              Applicable <b>VAT</b> or other taxes will be added where required
-              by law and shown at checkout.
-            </LI>
-          </UL>
-        </Section>
-
-        <Section title="Cancellation / Refund Policy">
+        <Section title="Membership & Payments">
           <P>
-            You can cancel at any time by logging into your membership portal
-            and changing your preference. Cancellations must be made before the
-            next billing cycle to avoid being charged for the subsequent month.
+            This Site is informational only. It does not take payments or manage
+            paid accounts. To become a member you are directed to our Telegram
+            bot, where any subscription is arranged.
           </P>
           <P>
-            As a general principle, we <b>do not offer refunds</b> for digital
-            products or services due to their nature and the immediate access
-            provided. In exceptional circumstances, you may contact{" "}
+            Pricing, billing, renewals, cancellation, and refunds are governed
+            by the terms presented to you at the point of sign-up in the
+            Telegram bot and apply to that transaction. Applicable <b>VAT</b> or
+            other taxes are added where required by law. Questions? Email{" "}
             <a
               className="underline underline-offset-2"
               href="mailto:rangeuniversellc@gmail.com"
             >
               rangeuniversellc@gmail.com
-            </a>{" "}
-            and we will review on a case-by-case basis.
+            </a>
+            .
           </P>
         </Section>
 
@@ -132,7 +114,7 @@ export default function TermsPage() {
               <b>Strictly prohibited:</b> publishing, reposting, forwarding,
               leaking, scraping, or distributing any signals, analysis, content,
               or tools outside your personal account. Detected leaks may result
-              in immediate termination <b>without refund</b>.
+              in immediate termination of your membership.
             </LI>
             <LI>
               No unlawful, harmful, or abusive activity; no attempts to bypass
