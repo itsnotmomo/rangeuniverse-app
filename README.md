@@ -23,25 +23,21 @@ Open [http://localhost:3000](http://localhost:3000).
 | Route      | What it is                                  |
 | ---------- | ------------------------------------------- |
 | `/`        | Homepage — signals, stats, pricing, FAQ     |
-| `/join`    | Plan selection and checkout                 |
 | `/privacy` | Privacy policy                              |
 | `/terms`   | Terms of service                            |
 
-`/signals` permanently redirects to `/`, which it used to be. `/mr*` redirects
-to the homepage.
+`/signals` permanently redirects to `/`, which it used to be. `/v2c` redirects
+to `/` (it was promoted to the homepage). `/mr*` redirects to the homepage.
 
-## Payments
+## Sign-ups
 
-Checkout is handled entirely by **Whop** via hosted links in `/join`. Plan IDs
-are hardcoded there. There is no payment, auth, or database integration in this
-codebase — the Stripe webhook at `src/app/api/webhooks/stripe/route.ts` is an
-unused stub that verifies signatures and discards events. Access is granted
-manually today.
+Every "Join the room" CTA links straight to the Telegram bot
+(`https://t.me/rangefx_bot?start=website`). There is no on-site checkout,
+payment, auth, or database integration in this codebase.
 
 ## Environment
 
-Copy `.env.example` to `.env.local`. The Stripe and Supabase variables are
-scaffolding for planned work and are not read by any code that ships today.
+Copy `.env.example` to `.env.local`. The only variable is `NEXT_PUBLIC_SITE_URL`.
 
 ## Deploying
 
