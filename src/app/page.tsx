@@ -14,6 +14,7 @@ import {
 import { RECORD } from '@/lib/record';
 import { CountUp, Reveal } from '@/lib/motion';
 import { Faq } from '@/components/Faq';
+import { BackgroundVideo } from '@/components/BackgroundVideo';
 import { FeatureVideo } from '@/components/FeatureVideo';
 import { RecordHistory } from '@/components/RecordHistory';
 import { SiteHeader } from '@/components/SiteHeader';
@@ -43,14 +44,16 @@ export default function Home() {
  * HERO
  * ------------------------------------------------------------------ */
 
-// Placeholder media while the real hero footage is prepared. The slot and its
-// poster stay put; only the file behind them changes.
+// Placeholder footage while the real hero video is prepared. Only the file
+// behind these two paths changes.
 const HERO_MEDIA = { src: '/media/hero.mp4', poster: '/media/hero-poster.jpg' };
 
 function Hero() {
   return (
     <section className="hero">
-      <div className="glow" aria-hidden />
+      <BackgroundVideo src={HERO_MEDIA.src} poster={HERO_MEDIA.poster} />
+      <div className="hero-scrim" aria-hidden />
+
       <div className="wrap hero-stack">
         <Reveal>
           <h1 className="hero-title">
@@ -80,16 +83,6 @@ function Hero() {
         <Reveal delay={0.24}>
           <div className="hero-cta">
             <CtaButton>Join Now</CtaButton>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.3}>
-          <div className="hero-media">
-            <span className="corner" aria-hidden />
-            <span className="corner" aria-hidden />
-            <span className="corner" aria-hidden />
-            <span className="corner" aria-hidden />
-            <FeatureVideo src={HERO_MEDIA.src} poster={HERO_MEDIA.poster} />
           </div>
         </Reveal>
       </div>

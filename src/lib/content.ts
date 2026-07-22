@@ -29,8 +29,7 @@ export const HERO_SUB = 'Where discipline compounds.';
  * as the old is/is-not columns, set as centred prose.
  */
 export const STATEMENT: ReadonlyArray<string> = [
-  'Most rooms in this industry are built to be joined, not to be stayed in. The Compound is built the other way around. It is worth being precise about the difference.',
-  'It is not a signals room. We do not sell entries to be copied blindly — a position you cannot explain is a position you should not hold. It is not gambling: size and invalidation are decided before a trade is opened, never renegotiated after it moves against us. It is not get-rich-quick, because nothing here compounds in a week; the whole premise is that it compounds over years, which requires you to still be here. And it is not a guru room. No lifestyle content, no rented cars, no screenshots of a balance you cannot verify.',
+  'It is not a signals room. We do not sell entries to be copied blindly. A position you cannot explain is a position you should not hold. It is not gambling: size and invalidation are decided before a trade is opened, never renegotiated after it moves against us. It is not get-rich-quick, because nothing here compounds in a week; the whole premise is that it compounds over years, which requires you to still be here. And it is not a guru room. No lifestyle content, no rented cars, no screenshots of a balance you cannot verify.',
   'What it is, is a private execution desk. One methodology, written down, applied the same way every session by everyone in the room. Risk before return — every position carries a defined loss before it carries a target, because capital preservation is the first job. A daily rhythm: outlook in the morning, execution during the sessions, an honest review at the end of the week.',
   'And a standard held mutually. Members are held to the process, and so are we. The record is published whichever way it goes.',
 ];

@@ -490,18 +490,69 @@ a {
 }
 
 /* ============================================================
-   HERO — centred stack over a framed media slot
+   HERO — left-aligned stack over a full-bleed background video
    ============================================================ */
 .hero {
   position: relative;
+  min-height: 88svh;
+  display: flex;
+  align-items: center;
   background: var(--void);
   isolation: isolate;
   overflow: hidden;
-  padding-top: clamp(112px, 15vh, 152px);   /* clears the 76px fixed header */
-  padding-bottom: clamp(48px, 6vw, 80px);
+  padding-top: clamp(108px, 13vh, 144px);   /* clears the 76px fixed header */
+  padding-bottom: clamp(52px, 6.5vw, 84px);
 }
 
-.hero-stack { text-align: center; }
+/* Media sits under everything and is deliberately faint — it is atmosphere,
+   not content. The scrim does the rest of the work. */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-bg img,
+.hero-bg video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+}
+
+/* Video fades in over the poster once it can play. */
+.hero-bg video {
+  opacity: 0;
+  transition: opacity 1.4s var(--ease);
+}
+.hero-bg video[data-ready='true'] { opacity: 0.45; }
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(8, 9, 10, 0.88) 0%,
+      rgba(8, 9, 10, 0.6) 32%,
+      rgba(8, 9, 10, 0.72) 70%,
+      var(--bg) 100%
+    ),
+    /* Keeps the left column, where the copy sits, darkest. */
+    radial-gradient(120% 95% at 10% 50%, rgba(8, 9, 10, 0.42) 0%, rgba(8, 9, 10, 0.82) 100%);
+}
+
+.hero > .wrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.hero-stack { text-align: left; }
 
 .hero-title {
   font-family: var(--f-display);
@@ -510,7 +561,7 @@ a {
   line-height: 1.0;
   letter-spacing: -0.02em;
   color: var(--ink);
-  margin: 0 auto;
+  margin: 0;
   max-width: 15ch;
 }
 
@@ -520,7 +571,7 @@ a {
   list-style: none;
   display: grid;
   gap: 13px;
-  justify-content: center;
+  justify-content: start;
 }
 
 .hero-point {
@@ -548,7 +599,7 @@ a {
 
 .hero-point-tick svg { width: 10px; height: 10px; }
 
-/* Sits directly above the button — centred, no rule. */
+/* Sits directly above the button — no rule beside it. */
 .hero-sub {
   margin-top: clamp(28px, 3.4vw, 40px);
   font-family: var(--f-display);
@@ -559,30 +610,6 @@ a {
 }
 
 .hero-cta { margin-top: clamp(18px, 2vw, 24px); }
-
-.hero-media {
-  position: relative;
-  margin: clamp(44px, 5.5vw, 76px) auto 0;
-  max-width: 940px;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border: 1px solid var(--line-strong);
-  background: var(--surface);
-}
-
-.hero-media .corner {
-  position: absolute;
-  z-index: 2;
-  width: 20px;
-  height: 20px;
-  border: 1px solid var(--gold);
-  opacity: 0.6;
-  pointer-events: none;
-}
-.hero-media .corner:nth-child(1) { top: 14px; left: 14px; border-right: 0; border-bottom: 0; }
-.hero-media .corner:nth-child(2) { top: 14px; right: 14px; border-left: 0; border-bottom: 0; }
-.hero-media .corner:nth-child(3) { bottom: 14px; left: 14px; border-right: 0; border-top: 0; }
-.hero-media .corner:nth-child(4) { bottom: 14px; right: 14px; border-left: 0; border-top: 0; }
 
 /* ============================================================
    STATEMENT — centred flowing prose, replaces the is/is-not columns
