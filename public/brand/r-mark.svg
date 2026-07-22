@@ -1,0 +1,7 @@
+<!-- REPLACE: off-white R-mark. Drop the real asset here, same filename. -->
+<!-- Placeholder only: geometric R in off-white, 64x64 viewBox. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Range Compound">
+  <rect x="1" y="1" width="62" height="62" rx="14" stroke="#F2F0EC" stroke-opacity="0.28" stroke-width="1.5"/>
+  <path d="M22 46V18h11.5a8.5 8.5 0 0 1 0 17H22" stroke="#F2F0EC" stroke-width="3.2" stroke-linecap="square"/>
+  <path d="M32 35l10 11" stroke="#F2F0EC" stroke-width="3.2" stroke-linecap="square"/>
+</svg>
