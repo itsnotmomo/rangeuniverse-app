@@ -2,7 +2,9 @@ import Image from 'next/image';
 import { BRAND, TELEGRAM_BOT } from '@/lib/brand';
 import {
   FEATURED_QUOTE,
+  FEATURES,
   HERO_POINTS,
+  HERO_SUB,
   INSIDE,
   IS,
   IS_NOT,
@@ -10,10 +12,12 @@ import {
   PRICE,
   STATS,
 } from '@/lib/content';
-import { RECORD, fmtPct } from '@/lib/record';
+import { RECORD } from '@/lib/record';
 import { CountUp, Reveal } from '@/lib/motion';
 import { Faq } from '@/components/Faq';
+import { FeatureVideo } from '@/components/FeatureVideo';
 import { HeroVideo } from '@/components/HeroVideo';
+import { RecordHistory } from '@/components/RecordHistory';
 import { SiteHeader } from '@/components/SiteHeader';
 
 export default function Home() {
@@ -26,6 +30,8 @@ export default function Home() {
         <Inside />
         <Record />
         <Skeptic />
+        <FeatureBlocks />
+        <FeaturedQuote />
         <Pricing />
         <Voices />
         <FaqSection />
@@ -58,7 +64,7 @@ function Hero() {
         <div className="wrap">
           <Reveal>
             <h1 className="hero-title">
-              Where discipline <em>compounds</em>.
+              A place for serious <em>long-term wealth builders</em>.
             </h1>
           </Reveal>
 
@@ -81,6 +87,10 @@ function Hero() {
             <div className="hero-cta">
               <CtaButton>Join Now</CtaButton>
             </div>
+          </Reveal>
+
+          <Reveal delay={0.28}>
+            <p className="hero-sub">{HERO_SUB}</p>
           </Reveal>
         </div>
       </div>
@@ -212,7 +222,7 @@ function Record() {
           <div className="sec-head-center">
             <p className="eyebrow eyebrow-center">Track record</p>
             <h2 className="title">
-              The record, published in <em>full</em>.
+              Our track record, published in <em>full</em>.
             </h2>
           </div>
         </Reveal>
@@ -222,13 +232,13 @@ function Record() {
             className="body-copy"
             style={{ marginTop: 24, marginInline: 'auto', textAlign: 'center', maxWidth: '56ch' }}
           >
-            Every month since {RECORD.firstLabel} is on the record, including the one that went
-            against us.
+            Range Compound has existed since October 2023, and we have kept a public record ever
+            since.
           </p>
         </Reveal>
 
         <Reveal delay={0.12}>
-          <div className="stat-grid">
+          <div className="stat-grid stat-grid-6">
             {STATS.map((s) => (
               <div className="stat" key={s.label}>
                 <div className={`stat-value${s.value === null ? ' stat-value-empty' : ''}`}>
@@ -259,14 +269,16 @@ function Record() {
               color: 'var(--ink-2)',
             }}
           >
-            Best month <span className="num gold">{fmtPct(RECORD.best.gainPct)}</span> (
-            {RECORD.best.month} {RECORD.best.year}), worst{' '}
-            <span className="num" style={{ color: 'var(--ink)' }}>
-              {fmtPct(RECORD.worst.gainPct)}
-            </span>{' '}
-            ({RECORD.worst.month} {RECORD.worst.year}). {RECORD.negatives} of {RECORD.months} months
-            closed negative and stayed on the record.
+            Of {RECORD.months} months,{' '}
+            <span className="num gold">{RECORD.negatives}</span> closed negative — and stayed on the
+            record.
           </p>
+        </Reveal>
+
+        <Reveal delay={0.22}>
+          <div style={{ textAlign: 'center' }}>
+            <RecordHistory />
+          </div>
         </Reveal>
 
         <Reveal delay={0.24}>
@@ -338,6 +350,65 @@ function Skeptic() {
 }
 
 /* ------------------------------------------------------------------ *
+ * FEATURE BLOCKS — #system
+ * Alternating copy and framed media. See the note in src/lib/content.ts about
+ * the placeholder footage.
+ * ------------------------------------------------------------------ */
+
+function FeatureBlocks() {
+  return (
+    <section id="system" className="sec">
+      <div className="glow" aria-hidden />
+      <div className="wrap">
+        {FEATURES.map((f, i) => (
+          <div className={`feature${i % 2 === 1 ? ' feature-alt' : ''}`} key={f.eyebrow}>
+            <Reveal className="feature-copy" dir={i % 2 === 1 ? 'right' : 'left'}>
+              <p className="eyebrow">{f.eyebrow}</p>
+              <h2 className="title-sm">
+                {f.title} <em>{f.accent}</em>.
+              </h2>
+              {f.body.map((para) => (
+                <p key={para.slice(0, 24)}>{para}</p>
+              ))}
+            </Reveal>
+
+            <Reveal delay={0.12} dir={i % 2 === 1 ? 'left' : 'right'}>
+              <FeatureVideo src={f.video} poster={f.poster} />
+            </Reveal>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * FEATURED QUOTE — sits between the feature blocks and pricing.
+ * ------------------------------------------------------------------ */
+
+function FeaturedQuote() {
+  return (
+    <section className="sec sec-tight">
+      <div className="wrap">
+        <Reveal>
+          <p className="eyebrow eyebrow-center">{FEATURED_QUOTE.eyebrow}</p>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <figure className="quote-feature">
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <blockquote>&ldquo;{FEATURED_QUOTE.quote}&rdquo;</blockquote>
+            <figcaption>{FEATURED_QUOTE.attribution}</figcaption>
+          </figure>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * PRICING — #pricing
  * ------------------------------------------------------------------ */
 
@@ -380,22 +451,10 @@ function Voices() {
       <div className="wrap">
         <Reveal>
           <div className="sec-head-center">
-            <p className="eyebrow eyebrow-center">Members</p>
             <h2 className="title">
-              In their <em>own words</em>.
+              Members and their <em>experience</em>.
             </h2>
           </div>
-        </Reveal>
-
-        <Reveal delay={0.1}>
-          <figure className="quote-feature">
-            <span className="corner" aria-hidden />
-            <span className="corner" aria-hidden />
-            <span className="corner" aria-hidden />
-            <span className="corner" aria-hidden />
-            <blockquote>&ldquo;{FEATURED_QUOTE.quote}&rdquo;</blockquote>
-            <figcaption>{FEATURED_QUOTE.attribution}</figcaption>
-          </figure>
         </Reveal>
 
         <Reveal delay={0.16}>
@@ -458,7 +517,7 @@ function FaqSection() {
           <div className="sec-head-center">
             <p className="eyebrow eyebrow-center">Honest answers</p>
             <h2 className="title">
-              The questions worth <em>asking</em>.
+              The questions worth asking <em>before you join</em>.
             </h2>
           </div>
         </Reveal>

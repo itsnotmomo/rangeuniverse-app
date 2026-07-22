@@ -86,6 +86,17 @@ ffmpeg -y -ss 8 -i public/media/hero.mp4 -frames:v 1 -q:v 5 \
 5.8 MB in, 653 KB out. mp4 only — VP9 encoded *larger* than h264 on this
 material, so a second source would only cost bytes.
 
+### Feature-block videos
+
+`public/media/strategy.mp4` and `public/media/vault.mp4` are produced the same
+way from `public/Strategy.mp4` and `public/Vault.mp4`, at `gblur=sigma=5` and
+`-crf 33`, cut from different segments (0–8s and 7.5–15.5s).
+
+> **These three source files are currently byte-identical** — `Strategy.mp4`
+> and `Vault.mp4` are copies of `homepage.mp4`. The different segments stop the
+> page showing one loop three times, but both slots want real footage. Replace
+> the sources and re-run the encode.
+
 `src/components/HeroVideo.tsx` paints the poster first and only requests the
 video when the visitor's environment allows it: no request at all under
 `prefers-reduced-motion`, `Save-Data`, or a 2g connection.

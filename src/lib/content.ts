@@ -13,9 +13,12 @@ import { RECORD } from './record';
 
 export const HERO_POINTS: ReadonlyArray<string> = [
   '1,000+ members',
-  '4 analysts',
+  '4 full-time analysts',
   'Access to The Vault',
 ];
+
+/** Sits under the hero block as a quiet restatement of the old headline. */
+export const HERO_SUB = 'Where discipline compounds.';
 
 /* ------------------------------------------------------------------ *
  * WHAT IS THE COMPOUND — what it is not, and what it is.
@@ -23,7 +26,7 @@ export const HERO_POINTS: ReadonlyArray<string> = [
 
 export const IS_NOT: ReadonlyArray<{ head: string; body: string }> = [
   {
-    head: 'Not a signals group',
+    head: 'Not a signals room',
     body: 'We do not sell entries to be copied blindly. A position you cannot explain is a position you should not hold.',
   },
   {
@@ -51,10 +54,10 @@ export const IS: ReadonlyArray<{ head: string; body: string }> = [
   },
   {
     head: 'A daily rhythm',
-    body: 'Outlook in the morning, execution during the session, an honest review at the end of the week.',
+    body: 'Outlook in the morning, execution during the sessions, an honest review at the end of the week.',
   },
   {
-    head: 'A standard, held mutually',
+    head: 'A standard held mutually',
     body: 'Members are held to the process, and so are we. The record is published whichever way it goes.',
   },
 ];
@@ -87,7 +90,7 @@ export const INSIDE: ReadonlyArray<{ n: string; title: string; body: string }> =
   {
     n: 'V',
     title: 'The Vault',
-    body: 'The full archive of past analysis and the documented methodology, so you are learning to execute it yourself rather than renting it.',
+    body: 'The full archive of past analysis and the documented methodology. You are learning to execute it yourself rather than renting it.',
   },
 ];
 
@@ -134,6 +137,20 @@ export const STATS: ReadonlyArray<Stat> = [
     label: 'Positions logged',
     note: 'Entry, stop and exit recorded',
   },
+  {
+    value: RECORD.best.gainPct,
+    prefix: '+',
+    suffix: '%',
+    label: 'Best month',
+    note: `${RECORD.best.month} ${RECORD.best.year}`,
+  },
+  {
+    value: RECORD.worst.gainPct,
+    decimals: 1,
+    suffix: '%',
+    label: 'Worst month',
+    note: `${RECORD.worst.month} ${RECORD.worst.year}`,
+  },
 ];
 
 /* ------------------------------------------------------------------ *
@@ -157,10 +174,53 @@ export const PRICE = {
  * ------------------------------------------------------------------ */
 
 export const FEATURED_QUOTE = {
-  quote:
-    'The analyses themselves are worth every dollar. Nothing else I’ve ever subscribed to comes close.',
+  eyebrow: 'Members, in their own words',
+  quote: 'The analysis is worth every dollar. Nothing I’ve ever subscribed to comes close.',
   attribution: 'Member, Range Compound',
 } as const;
+
+/* ------------------------------------------------------------------ *
+ * FEATURE BLOCKS — alternating text + framed media.
+ *
+ * NOTE: public/Strategy.mp4 and public/Vault.mp4 are currently byte-identical
+ * copies of public/homepage.mp4. The encodes below are cut from different
+ * segments so the page does not show the same loop three times, but both slots
+ * need real footage. Re-run the recipe in the README after replacing them.
+ * ------------------------------------------------------------------ */
+
+export type Feature = {
+  eyebrow: string;
+  title: string;
+  accent: string;
+  body: ReadonlyArray<string>;
+  video: string;
+  poster: string;
+};
+
+export const FEATURES: ReadonlyArray<Feature> = [
+  {
+    eyebrow: 'The System',
+    title: 'One methodology, taught in',
+    accent: 'real time',
+    body: [
+      'Members do not receive conclusions. They watch the read being built — the levels that matter, the conditions that would invalidate it, and the reasoning behind every position as it is taken.',
+      'It is the same framework every session, documented and unchanging, so the thing you are learning is transferable. The aim is that you eventually run it without us.',
+    ],
+    video: '/media/strategy.mp4',
+    poster: '/media/strategy-poster.jpg',
+  },
+  {
+    eyebrow: 'The Vault',
+    title: 'Every piece of past analysis,',
+    accent: 'unlocked on day one',
+    body: [
+      'The Vault is the complete archive: every outlook, every documented position, and the reasoning attached to each one, going back to the start of the record in October 2023.',
+      'Nothing is drip-fed and nothing is held back for a later tier. You get all of it the moment you join, because studying how a read was reached is worth more than being handed the read.',
+    ],
+    video: '/media/vault.mp4',
+    poster: '/media/vault-poster.jpg',
+  },
+];
 
 // Three columns of member screenshots, drawn from the published archive.
 export const MEMBER_SHOTS: ReadonlyArray<ReadonlyArray<string>> = [
