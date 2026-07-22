@@ -408,15 +408,40 @@ a {
   border-bottom-color: var(--line);
 }
 
+/* Full-bleed rather than constrained to --maxw, so the logo sits hard left and
+   the CTA hard right against the page gutter. The nav takes the middle. */
+.header-bar {
+  padding-inline: clamp(20px, 3.4vw, 52px);
+}
+
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: clamp(16px, 3vw, 48px);
   height: 76px;
 }
 
+.header-left  { flex: 0 0 auto; }
+.header-right { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; }
+
+/* Centre group absorbs the slack between the two fixed ends. */
+.header-mid {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
 .wordmark { display: inline-flex; align-items: center; gap: 12px; }
+
+/* Height-driven so the intrinsic aspect ratio decides the width. The source is
+   940x539, well above 2x for this box, so it stays crisp on retina. */
+.wordmark-img {
+  height: clamp(30px, 3.4vw, 42px);
+  width: auto;
+  display: block;
+}
 
 .wordmark-text {
   font-family: var(--f-sans);
@@ -428,7 +453,7 @@ a {
   white-space: nowrap;
 }
 
-.desknav { display: none; gap: 34px; }
+.desknav { display: none; gap: clamp(24px, 2.8vw, 46px); }
 
 .navlink {
   position: relative;

@@ -4,6 +4,19 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { BRAND, NAV, TELEGRAM_BOT } from '@/lib/brand';
 
+/*
+ * TO SWAP IN THE REAL LOGO: replace the two children of <a className="wordmark">
+ * with
+ *
+ *   <Image src="/logo.png" alt={BRAND.name} width={940} height={539}
+ *          className="wordmark-img" priority />
+ *
+ * .wordmark-img is already defined (height-driven, width auto, sized for 2x).
+ * Held back for now because public/logo.png reads "The COUMPOND" — the U and M
+ * are transposed. Drop a corrected file at the same path and this is a
+ * one-line change.
+ */
+
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -17,22 +30,25 @@ export function SiteHeader() {
 
   return (
     <header className="site-header" data-scrolled={scrolled || open}>
-      <div className="wrap header-inner">
-        <a className="wordmark" href="#top" aria-label={`${BRAND.name} — home`}>
-          {/* REPLACE: gold R-mark — drop the real file at public/brand/r-mark-gold.svg */}
-          <Image src="/brand/r-mark-gold.svg" alt="" width={26} height={26} priority />
-          <span className="wordmark-text">{BRAND.name}</span>
-        </a>
+      <div className="header-bar header-inner">
+        <div className="header-left">
+          <a className="wordmark" href="#top" aria-label={`${BRAND.name} — home`}>
+            <Image src="/brand/r-mark-gold.svg" alt="" width={26} height={26} priority />
+            <span className="wordmark-text">{BRAND.name}</span>
+          </a>
+        </div>
 
-        <nav className="desknav" aria-label="Primary">
-          {NAV.map(([label, href]) => (
-            <a key={href} className="navlink" href={href}>
-              {label}
-            </a>
-          ))}
-        </nav>
+        <div className="header-mid">
+          <nav className="desknav" aria-label="Primary">
+            {NAV.map(([label, href]) => (
+              <a key={href} className="navlink" href={href}>
+                {label}
+              </a>
+            ))}
+          </nav>
+        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div className="header-right">
           <a
             className="btn btn-ghost hide-sm"
             href={TELEGRAM_BOT}
@@ -58,7 +74,7 @@ export function SiteHeader() {
 
       {open && (
         <div className="mobnav">
-          <div className="wrap" style={{ paddingBottom: 20 }}>
+          <div className="header-bar" style={{ paddingBottom: 20 }}>
             {NAV.map(([label, href]) => (
               <a key={href} className="navlink" href={href} onClick={() => setOpen(false)}>
                 {label}
