@@ -49,7 +49,7 @@ export default function TermsPage() {
         <Section title="Agreement Between User and Range Compound">
           <P>
             Range Compound FZ-LLC (<B>Range Compound</B>, <B>we</B>, <B>us</B>,
-            or <B>our</B>) publishes rangeuniverse.com (the <B>Site</B>) and
+            or <B>our</B>) publishes rangecompound.com (the <B>Site</B>) and
             operates a private, invitation-based educational membership (the{" "}
             <B>Membership</B>). By accessing or using the Site, you agree to
             these Terms &amp; Conditions (the <B>Terms</B>).

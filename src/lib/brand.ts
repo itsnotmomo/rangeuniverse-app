@@ -7,10 +7,9 @@ export const BRAND = {
   tagline: 'Where discipline compounds.',
 } as const;
 
-// The domain the site is actually served from today. The brand renamed to
-// Range Compound but the domain has not moved yet — change this one constant
-// when it does, and the legal pages and metadata follow.
-export const SITE_DOMAIN = 'rangeuniverse.com';
+// The domain the site is served from. Change this one constant and the legal
+// pages, canonical metadata and Open Graph URLs all follow.
+export const SITE_DOMAIN = 'rangecompound.com';
 export const SITE_URL = `https://${SITE_DOMAIN}`;
 
 export const TELEGRAM_BOT = 'https://t.me/rangefx_bot?start=website';

@@ -6,7 +6,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How Range Compound FZ-LLC collects, uses, and protects information on rangeuniverse.com.",
+    "How Range Compound FZ-LLC collects, uses, and protects information on rangecompound.com.",
 };
 
 const UPDATED = "22 Jul 2026";
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
         <LSection title="Who We Are">
           <P>
             Range Compound FZ-LLC (<B>Range Compound</B>, <B>we</B>, <B>us</B>)
-            operates rangeuniverse.com (the <B>Site</B>). We are the controller
+            operates rangecompound.com (the <B>Site</B>). We are the controller
             for the limited personal information processed through the Site.
           </P>
           <UL>

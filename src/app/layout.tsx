@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Instrument_Sans, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
-import { SITE_URL } from '@/lib/brand';
+import { BRAND, SITE_URL } from '@/lib/brand';
 
 // Display — high-contrast serif. Reads private-capital, not crypto-room.
 const display = Instrument_Serif({
@@ -26,19 +26,45 @@ const mono = JetBrains_Mono({
   variable: '--font-mono',
 });
 
+const DESCRIPTION =
+  'Range Compound is a private execution desk. A disciplined methodology, real risk management, and performance compounded week over week. Membership is intentionally limited.';
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Range Compound — Where discipline compounds',
-    template: '%s | Range Compound',
+    default: 'The Compound',
+    template: '%s | The Compound',
   },
-  description:
-    'Range Compound is a private execution desk. A disciplined methodology, real risk management, and performance compounded week over week. Membership is intentionally limited.',
+  description: DESCRIPTION,
+
+  // The favicon package from public/favicon/. favicon.svg is deliberately not
+  // listed: it is a 272KB base64 raster wrapped in an <svg>, not real vector
+  // art, so it would be no sharper than the 4.8KB PNG — but browsers that
+  // support SVG icons prefer them, so listing it would ship the heavy file for
+  // no gain.
+  icons: {
+    icon: [
+      { url: '/favicon/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
+      { url: '/favicon/favicon.ico', sizes: 'any' },
+    ],
+    shortcut: '/favicon/favicon.ico',
+    apple: '/favicon/apple-touch-icon.png',
+  },
+  manifest: '/favicon/site.webmanifest',
+
   openGraph: {
-    title: 'Range Compound — Where discipline compounds',
-    description:
-      'A private execution desk. Disciplined methodology, real risk management, compounding performance.',
+    title: 'The Compound',
+    description: DESCRIPTION,
+    siteName: BRAND.name,
+    url: SITE_URL,
     type: 'website',
+    images: [{ url: '/og-image.png', width: 1731, height: 909, alt: BRAND.name }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'The Compound',
+    description: DESCRIPTION,
+    images: ['/og-image.png'],
   },
 };
 
