@@ -436,21 +436,12 @@ a {
 .wordmark { display: inline-flex; align-items: center; gap: 12px; }
 
 /* Height-driven so the intrinsic aspect ratio decides the width. The source is
-   940x539, well above 2x for this box, so it stays crisp on retina. */
+   1018x426 against a ~120px slot — far beyond 2x, so it stays crisp on retina.
+   The PNG's background is transparent, so it sits directly on the header. */
 .wordmark-img {
-  height: clamp(30px, 3.4vw, 42px);
+  height: clamp(34px, 3.8vw, 48px);
   width: auto;
   display: block;
-}
-
-.wordmark-text {
-  font-family: var(--f-sans);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--ink);
-  white-space: nowrap;
 }
 
 .desknav { display: none; gap: clamp(24px, 2.8vw, 46px); }

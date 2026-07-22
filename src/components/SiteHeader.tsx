@@ -4,19 +4,6 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { BRAND, NAV, TELEGRAM_BOT } from '@/lib/brand';
 
-/*
- * TO SWAP IN THE REAL LOGO: replace the two children of <a className="wordmark">
- * with
- *
- *   <Image src="/logo.png" alt={BRAND.name} width={940} height={539}
- *          className="wordmark-img" priority />
- *
- * .wordmark-img is already defined (height-driven, width auto, sized for 2x).
- * Held back for now because public/logo.png reads "The COUMPOND" — the U and M
- * are transposed. Drop a corrected file at the same path and this is a
- * one-line change.
- */
-
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -32,9 +19,20 @@ export function SiteHeader() {
     <header className="site-header" data-scrolled={scrolled || open}>
       <div className="header-bar header-inner">
         <div className="header-left">
-          <a className="wordmark" href="#top" aria-label={`${BRAND.name} — home`}>
-            <Image src="/brand/r-mark-gold.svg" alt="" width={26} height={26} priority />
-            <span className="wordmark-text">{BRAND.name}</span>
+          <a className="wordmark" href="#top">
+            {/* Declared at 256 wide while CSS renders it at most 115 (the
+                clamp tops out at 48px tall). Browsers do not reliably upgrade
+                to the 2x srcset candidate, so the 1x candidate is itself made
+                retina-sufficient — 256 against a 115px slot is 2.2x on desktop
+                and 3.2x on mobile. The file is a few KB either way. */}
+            <Image
+              src="/logo.png"
+              alt={BRAND.name}
+              width={256}
+              height={107}
+              className="wordmark-img"
+              priority
+            />
           </a>
         </div>
 
