@@ -16,9 +16,9 @@ export const SITE_URL = `https://${SITE_DOMAIN}`;
 export const TELEGRAM_BOT = 'https://t.me/rangefx_bot?start=website';
 
 export const NAV: ReadonlyArray<readonly [label: string, href: string]> = [
-  ['Standard', '#standard'],
-  ['Inside', '#inside'],
+  ['About', '#standard'],
+  ['Included', '#inside'],
   ['Record', '#record'],
-  ['Process', '#process'],
-  ['Access', '#access'],
+  ['Pricing', '#pricing'],
+  ['Answers', '#answers'],
 ];

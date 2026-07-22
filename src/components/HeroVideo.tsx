@@ -13,9 +13,19 @@ import { useEffect, useState } from 'react';
  *   - Save-Data header enabled        → poster only
  *   - 2g / slow-2g effective type     → poster only
  *
- * So a slow or data-saving connection downloads ~12KB, not the loop.
+ * So a slow or data-saving connection downloads the poster, not the loop.
+ *
+ * `sources` are tried in order; the browser falls through to the next one if a
+ * file is missing or undecodable, which is what keeps the placeholder loop in
+ * place until the real footage lands.
  */
-export function HeroVideo({ poster }: { poster: string }) {
+export function HeroVideo({
+  poster,
+  sources,
+}: {
+  poster: string;
+  sources: ReadonlyArray<{ src: string; type: string }>;
+}) {
   const [playVideo, setPlayVideo] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -62,9 +72,9 @@ export function HeroVideo({ poster }: { poster: string }) {
             transition: 'opacity 1.2s cubic-bezier(0.2,0.7,0.2,1)',
           }}
         >
-          {/* REPLACE: hero video — swap public/media/hero.webm + hero.mp4 */}
-          <source src="/media/hero.webm" type="video/webm" />
-          <source src="/media/hero.mp4" type="video/mp4" />
+          {sources.map((s) => (
+            <source key={s.src} src={s.src} type={s.type} />
+          ))}
         </video>
       )}
     </div>

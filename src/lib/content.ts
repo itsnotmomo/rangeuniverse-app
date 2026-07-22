@@ -1,23 +1,24 @@
 // All homepage copy and data in one place.
 //
-// RULE FOR THIS FILE: no invented performance figures, win rates, returns,
-// member counts, or testimonials. Anything not yet supplied is `null` and
-// renders as a marked placeholder. See PLACEHOLDER_STATS and TESTIMONIALS.
+// RULE FOR THIS FILE: no invented figures. Every number below is either
+// supplied by the client as fact, or computed from the published monthly
+// record in src/lib/record.ts. Anything unsourced is marked `null` and renders
+// as a visible placeholder.
 
-export type Stat = {
-  /** Real value. `null` renders as "——" and skips the count-up. */
-  value: number | null;
-  decimals?: number;
-  prefix?: string;
-  suffix?: string;
-  separators?: boolean;
-  label: string;
-  /** Shown under the figure — what the number actually measures. */
-  note: string;
-};
+import { RECORD } from './record';
 
 /* ------------------------------------------------------------------ *
- * NEGATION — what The Compound is not, and what it is.
+ * HERO — client-supplied facts.
+ * ------------------------------------------------------------------ */
+
+export const HERO_POINTS: ReadonlyArray<string> = [
+  '1,000+ members',
+  '4 analysts',
+  'Access to The Vault',
+];
+
+/* ------------------------------------------------------------------ *
+ * WHAT IS THE COMPOUND — what it is not, and what it is.
  * ------------------------------------------------------------------ */
 
 export const IS_NOT: ReadonlyArray<{ head: string; body: string }> = [
@@ -85,42 +86,50 @@ export const INSIDE: ReadonlyArray<{ n: string; title: string; body: string }> =
   },
   {
     n: 'V',
-    title: 'The methodology',
-    body: 'The full framework, documented, so you are learning to execute it yourself rather than renting it.',
+    title: 'The Vault',
+    body: 'The full archive of past analysis and the documented methodology, so you are learning to execute it yourself rather than renting it.',
   },
 ];
 
 /* ------------------------------------------------------------------ *
- * TRACK RECORD — placeholders only.
+ * TRACK RECORD
  *
- * TO ACTIVATE: replace `value: null` with the real number. The count-up
- * animation turns on automatically. Delete `RECORD_IS_PLACEHOLDER` once every
- * figure below is real, and the placeholder banner disappears with it.
+ * Every figure here is derived from RECORD — the month-by-month log kept
+ * since October 2023. Nothing is hand-entered. See src/lib/record.ts.
  * ------------------------------------------------------------------ */
 
-export const RECORD_IS_PLACEHOLDER = true;
+export type Stat = {
+  value: number | null;
+  decimals?: number;
+  prefix?: string;
+  suffix?: string;
+  separators?: boolean;
+  label: string;
+  note: string;
+};
 
-export const PLACEHOLDER_STATS: ReadonlyArray<Stat> = [
+export const STATS: ReadonlyArray<Stat> = [
   {
-    value: null,
-    suffix: '%',
+    value: RECORD.trailing12Pct,
     decimals: 1,
+    prefix: '+',
+    suffix: '%',
     label: 'Trailing 12-month return',
-    note: 'Net, across the published account',
+    note: 'Sum of the last twelve documented months',
   },
   {
-    value: null,
+    value: RECORD.months,
     label: 'Months documented',
-    note: 'Every month shown, losses included',
+    note: `Unbroken since ${RECORD.firstLabel}`,
   },
   {
-    value: null,
+    value: RECORD.avgWinRatePct,
     suffix: '%',
     label: 'Average win rate',
-    note: 'Across all logged positions',
+    note: 'Across every logged position',
   },
   {
-    value: null,
+    value: RECORD.totalTrades,
     separators: true,
     label: 'Positions logged',
     note: 'Entry, stop and exit recorded',
@@ -128,86 +137,61 @@ export const PLACEHOLDER_STATS: ReadonlyArray<Stat> = [
 ];
 
 /* ------------------------------------------------------------------ *
- * PROCESS
+ * PRICING — single tier, client-supplied.
  * ------------------------------------------------------------------ */
 
-export const STEPS: ReadonlyArray<{ n: string; title: string; body: string }> = [
-  {
-    n: '01',
-    title: 'Request access',
-    body: 'A short conversation through the Telegram desk. We are checking that the fit is real in both directions before anything else happens.',
-  },
-  {
-    n: '02',
-    title: 'Learn the standard',
-    body: 'Before you place a single position you read the methodology and the risk rules. There is no version of this that starts with a trade.',
-  },
-  {
-    n: '03',
-    title: 'Execute alongside the desk',
-    body: 'You follow the daily rhythm with everyone else — outlook, execution, review — until the process is yours rather than ours.',
-  },
-  {
-    n: '04',
-    title: 'Compound',
-    body: 'Consistent size, consistent rules, reviewed weekly. The returns are a by-product of the discipline, not the other way round.',
-  },
-];
+export const PRICE = {
+  eyebrow: 'Monthly access',
+  amount: '€79',
+  cadence: '/ month',
+  sub: 'Instant access. Add your credentials and join The Compound in under 30 seconds.',
+  cta: 'Join Now',
+} as const;
 
 /* ------------------------------------------------------------------ *
- * PRICING — figures supplied by the client. The per-month equivalents are
- * plain arithmetic on those figures, not claims.
- * ------------------------------------------------------------------ */
-
-export type Tier = {
-  name: string;
-  price: string;
-  cadence: string;
-  equiv: string | null;
-  blurb: string;
-  featured?: boolean;
-};
-
-export const TIERS: ReadonlyArray<Tier> = [
-  {
-    name: 'Monthly',
-    price: '€69',
-    cadence: 'per month',
-    equiv: null,
-    blurb: 'Full access, month to month. Leave whenever it stops being worth it.',
-  },
-  {
-    name: 'Quarterly',
-    price: '€179',
-    cadence: 'every three months',
-    equiv: 'about €60 per month',
-    blurb: 'Long enough to judge the process across more than one kind of market.',
-  },
-  {
-    name: 'Annual',
-    price: '€599',
-    cadence: 'per year',
-    equiv: 'about €50 per month',
-    blurb: 'The horizon the methodology is actually built for. Best value by a distance.',
-    featured: true,
-  },
-];
-
-/* ------------------------------------------------------------------ *
- * TESTIMONIALS — structure only.
+ * TESTIMONIALS
  *
- * TO ACTIVATE: fill in `quote`, `attribution` and `meta`. Any entry left with
- * a null quote renders as an empty marked slot. No quotes are invented here.
+ * The featured quote was supplied by the client and is pending final
+ * confirmation. The screenshots are real member messages already published
+ * on the previous site (public/students/).
  * ------------------------------------------------------------------ */
 
-export type Testimonial = {
-  quote: string | null;
-  attribution: string | null;
-  meta: string | null;
-};
+export const FEATURED_QUOTE = {
+  quote:
+    'The analyses themselves are worth every dollar. Nothing else I’ve ever subscribed to comes close.',
+  attribution: 'Member, Range Compound',
+} as const;
 
-export const TESTIMONIALS: ReadonlyArray<Testimonial> = [
-  { quote: null, attribution: null, meta: null },
-  { quote: null, attribution: null, meta: null },
-  { quote: null, attribution: null, meta: null },
+// Three columns of member screenshots, drawn from the published archive.
+export const MEMBER_SHOTS: ReadonlyArray<ReadonlyArray<string>> = [
+  ['/students/1.webp', '/students/2.webp', '/students/3.webp', '/students/4.webp', '/students/5.webp', '/students/16.webp', '/students/17.webp'],
+  ['/students/6.webp', '/students/7.webp', '/students/8.webp', '/students/9.webp', '/students/10.webp', '/students/18.webp', '/students/19.webp', '/students/22.webp'],
+  ['/students/11.webp', '/students/12.webp', '/students/13.webp', '/students/14.webp', '/students/15.webp', '/students/20.webp', '/students/21.webp'],
+];
+
+/* ------------------------------------------------------------------ *
+ * FAQ — honest answers. The guarantee question says no, plainly.
+ * ------------------------------------------------------------------ */
+
+export const FAQS: ReadonlyArray<{ q: string; a: string }> = [
+  {
+    q: 'What makes it worth it?',
+    a: 'You get the same daily outlook, live execution and risk framework the desk runs on, plus The Vault — the full archive of past analysis. The point is not the individual call. It is that after a few months you can read a chart the way the desk reads it, and you stop needing anyone to tell you what to do.',
+  },
+  {
+    q: 'Do you guarantee financial freedom?',
+    a: 'No. We do not guarantee returns, income, or financial freedom, and anyone who does is lying to you. Trading carries a real risk of losing money. Our record is published in full, including the months that went against us, precisely so you can judge it yourself rather than take a promise on faith. What we commit to is the process and the transparency — never the outcome.',
+  },
+  {
+    q: 'Do I need a lot of money to get started?',
+    a: 'No. The methodology is built on fixed percentage risk, so it behaves the same on a small account as on a large one. Start with an amount you can genuinely afford to lose while you learn the process. Several members later add prop-firm funding once they have shown consistency — but that comes after the discipline, not before it.',
+  },
+  {
+    q: 'What is The Vault?',
+    a: 'The Vault is our full archive of past analysis — every outlook, every documented position and the reasoning behind it, going back to the beginning of the record. Members get access on day one. It is the difference between being handed a conclusion and being able to study how the conclusion was reached.',
+  },
+  {
+    q: 'Why do members stay?',
+    a: 'Mostly because the room is quiet. There is no upsell, no daily hype, and no pressure to trade when there is nothing worth trading. Members who stay tend to be the ones who wanted a standard to be held to rather than a stream of tips — and that is a slower, less exciting product that happens to be the one that lasts.',
+  },
 ];

@@ -40,7 +40,7 @@ export function SiteHeader() {
             rel="noopener noreferrer"
             style={{ padding: '11px 22px', fontSize: 14 }}
           >
-            Request access
+            Join Now
           </a>
           <button
             type="button"
@@ -72,7 +72,7 @@ export function SiteHeader() {
               onClick={() => setOpen(false)}
               style={{ marginTop: 20, width: '100%' }}
             >
-              Request access
+              Join Now
             </a>
           </div>
         </div>

@@ -1,15 +1,18 @@
+import Image from 'next/image';
 import { BRAND, TELEGRAM_BOT } from '@/lib/brand';
 import {
+  FEATURED_QUOTE,
+  HERO_POINTS,
   INSIDE,
   IS,
   IS_NOT,
-  PLACEHOLDER_STATS,
-  RECORD_IS_PLACEHOLDER,
-  STEPS,
-  TESTIMONIALS,
-  TIERS,
+  MEMBER_SHOTS,
+  PRICE,
+  STATS,
 } from '@/lib/content';
+import { RECORD, fmtPct } from '@/lib/record';
 import { CountUp, Reveal } from '@/lib/motion';
+import { Faq } from '@/components/Faq';
 import { HeroVideo } from '@/components/HeroVideo';
 import { SiteHeader } from '@/components/SiteHeader';
 
@@ -19,15 +22,13 @@ export default function Home() {
       <SiteHeader />
       <main id="top">
         <Hero />
-        <Negation />
+        <WhatIsIt />
         <Inside />
-        <Skeptic />
         <Record />
-        <Process />
-        <Voices />
-        <Access />
+        <Skeptic />
         <Pricing />
-        <FinalCta />
+        <Voices />
+        <FaqSection />
       </main>
       <Footer />
     </>
@@ -38,57 +39,48 @@ export default function Home() {
  * HERO
  * ------------------------------------------------------------------ */
 
+// The real footage is tried first; the generated loop stays as a fallback so
+// the hero never renders bare if the file is missing.
+const HERO_SOURCES = [
+  { src: '/home%20page.mp4', type: 'video/mp4' },
+  { src: '/media/hero.webm', type: 'video/webm' },
+  { src: '/media/hero.mp4', type: 'video/mp4' },
+] as const;
+
 function Hero() {
   return (
     <section className="hero">
-      {/* REPLACE: hero video — public/media/hero.mp4 + hero.webm + hero-poster.jpg */}
-      <HeroVideo poster="/media/hero-poster.jpg" />
+      <HeroVideo poster="/media/hero-poster.jpg" sources={HERO_SOURCES} />
       <div className="hero-scrim" aria-hidden />
 
       <div className="hero-body">
         <div className="wrap">
           <Reveal>
-            <p className="eyebrow">Private &middot; By invitation</p>
-          </Reveal>
-
-          <Reveal delay={0.08}>
             <h1 className="hero-title">
               Where discipline <em>compounds</em>.
             </h1>
           </Reveal>
 
-          <Reveal delay={0.16}>
-            <p className="hero-lede">
-              {BRAND.name} is a private execution desk. One methodology, risk managed on every
-              position, and performance compounded week over week — for people who treat this as a
-              business, not a lottery ticket.
-            </p>
+          <Reveal delay={0.1}>
+            <ul className="hero-points">
+              {HERO_POINTS.map((point) => (
+                <li className="hero-point" key={point}>
+                  <span className="hero-point-tick" aria-hidden>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6">
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                  {point}
+                </li>
+              ))}
+            </ul>
           </Reveal>
 
-          <Reveal delay={0.24}>
+          <Reveal delay={0.2}>
             <div className="hero-cta">
-              <CtaButton>Request access</CtaButton>
-              <p className="hero-cta-note">
-                Membership is intentionally limited. Access opens in small groups.
-              </p>
+              <CtaButton>Join Now</CtaButton>
             </div>
           </Reveal>
-        </div>
-      </div>
-
-      <div className="hero-rail">
-        <div className="wrap hero-rail-inner">
-          <div className="hero-rail-list">
-            <span className="hero-rail-item">Daily market outlook</span>
-            <span className="hero-rail-item">Live execution</span>
-            <span className="hero-rail-item">Risk before return</span>
-          </div>
-          <a className="scroll-cue" href="#standard">
-            Scroll
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M12 5v14M6 13l6 6 6-6" />
-            </svg>
-          </a>
         </div>
       </div>
     </section>
@@ -96,19 +88,19 @@ function Hero() {
 }
 
 /* ------------------------------------------------------------------ *
- * NEGATION — #standard
+ * WHAT IS THE COMPOUND — #standard
  * ------------------------------------------------------------------ */
 
-function Negation() {
+function WhatIsIt() {
   return (
     <section id="standard" className="sec">
       <div className="glow glow-left" aria-hidden />
       <div className="wrap">
         <Reveal>
           <div className="sec-head">
-            <p className="eyebrow">The standard</p>
+            <p className="eyebrow">What is The Compound?</p>
             <h2 className="title">
-              What this is, and what it <em>is not</em>.
+              A desk, not a <em>signals room</em>.
             </h2>
           </div>
         </Reveal>
@@ -206,7 +198,99 @@ function Inside() {
 }
 
 /* ------------------------------------------------------------------ *
- * SKEPTIC — #proof
+ * TRACK RECORD — #record
+ * Every figure is computed from src/lib/record.ts.
+ * ------------------------------------------------------------------ */
+
+function Record() {
+  return (
+    <section id="record" className="sec">
+      <div className="glow" aria-hidden />
+      <div className="wrap">
+        <Reveal>
+          <div className="sec-head-center">
+            <p className="eyebrow eyebrow-center">Track record</p>
+            <h2 className="title">
+              The record, published in <em>full</em>.
+            </h2>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.08}>
+          <p
+            className="body-copy"
+            style={{ marginTop: 24, marginInline: 'auto', textAlign: 'center', maxWidth: '56ch' }}
+          >
+            Every month since {RECORD.firstLabel} is on the record, including the one that went
+            against us.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.12}>
+          <div className="stat-grid">
+            {STATS.map((s) => (
+              <div className="stat" key={s.label}>
+                <div className={`stat-value${s.value === null ? ' stat-value-empty' : ''}`}>
+                  <CountUp
+                    to={s.value}
+                    decimals={s.decimals}
+                    prefix={s.prefix}
+                    suffix={s.suffix}
+                    separators={s.separators}
+                  />
+                </div>
+                <div className="stat-label">{s.label}</div>
+                <p className="stat-note">{s.note}</p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.18}>
+          <p
+            style={{
+              marginTop: 30,
+              marginInline: 'auto',
+              maxWidth: '68ch',
+              textAlign: 'center',
+              fontSize: 15,
+              lineHeight: 1.7,
+              color: 'var(--ink-2)',
+            }}
+          >
+            Best month <span className="num gold">{fmtPct(RECORD.best.gainPct)}</span> (
+            {RECORD.best.month} {RECORD.best.year}), worst{' '}
+            <span className="num" style={{ color: 'var(--ink)' }}>
+              {fmtPct(RECORD.worst.gainPct)}
+            </span>{' '}
+            ({RECORD.worst.month} {RECORD.worst.year}). {RECORD.negatives} of {RECORD.months} months
+            closed negative and stayed on the record.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.24}>
+          <p
+            style={{
+              marginTop: 22,
+              marginInline: 'auto',
+              maxWidth: '64ch',
+              textAlign: 'center',
+              fontSize: 13.5,
+              lineHeight: 1.7,
+              color: 'var(--muted)',
+            }}
+          >
+            Past performance does not guarantee future results, and every outcome depends on the
+            member&rsquo;s own execution and risk control.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * SCEPTICISM — #proof
  * ------------------------------------------------------------------ */
 
 function Skeptic() {
@@ -214,13 +298,13 @@ function Skeptic() {
     <section id="proof" className="sec">
       <div className="wrap">
         <div
+          className="skeptic-grid"
           style={{
             display: 'grid',
             gap: 'clamp(36px, 5vw, 72px)',
             gridTemplateColumns: '1fr',
             alignItems: 'start',
           }}
-          className="skeptic-grid"
         >
           <Reveal>
             <p className="eyebrow">On scepticism</p>
@@ -253,68 +337,32 @@ function Skeptic() {
 }
 
 /* ------------------------------------------------------------------ *
- * TRACK RECORD — #record
- * Figures are placeholders. See src/lib/content.ts.
+ * PRICING — #pricing
  * ------------------------------------------------------------------ */
 
-function Record() {
+function Pricing() {
   return (
-    <section id="record" className="sec">
+    <section id="pricing" className="sec">
       <div className="glow" aria-hidden />
       <div className="wrap">
         <Reveal>
           <div className="sec-head-center">
-            <p className="eyebrow eyebrow-center">Track record</p>
+            <p className="eyebrow eyebrow-center">{PRICE.eyebrow}</p>
             <h2 className="title">
-              The record, published in <em>full</em>.
+              Pay with <em>Card</em>.
             </h2>
           </div>
         </Reveal>
-
-        {RECORD_IS_PLACEHOLDER && (
-          <Reveal delay={0.08}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
-              <span className="placeholder-tag">Placeholder &middot; awaiting real data</span>
-            </div>
-          </Reveal>
-        )}
 
         <Reveal delay={0.12}>
-          <div className="stat-grid">
-            {PLACEHOLDER_STATS.map((s) => (
-              <div className="stat" key={s.label}>
-                <div className={`stat-value${s.value === null ? ' stat-value-empty' : ''}`}>
-                  <CountUp
-                    to={s.value}
-                    decimals={s.decimals}
-                    prefix={s.prefix}
-                    suffix={s.suffix}
-                    separators={s.separators}
-                  />
-                </div>
-                <div className="stat-label">{s.label}</div>
-                <p className="stat-note">{s.note}</p>
-              </div>
-            ))}
+          <div className="price-single">
+            <div className="price-amount">{PRICE.amount}</div>
+            <p className="price-cadence">{PRICE.cadence}</p>
+            <p className="price-sub">{PRICE.sub}</p>
+            <CtaButton variant="metal" size="lg">
+              {PRICE.cta}
+            </CtaButton>
           </div>
-        </Reveal>
-
-        <Reveal delay={0.18}>
-          <p
-            style={{
-              marginTop: 28,
-              marginInline: 'auto',
-              maxWidth: '62ch',
-              textAlign: 'center',
-              fontSize: 13.5,
-              lineHeight: 1.7,
-              color: 'var(--muted)',
-            }}
-          >
-            Figures are withheld until the verified record is published here in full — including the
-            months that went against us. Past performance would not guarantee future results in any
-            case, and every outcome depends on the member&rsquo;s own execution and risk control.
-          </p>
         </Reveal>
       </div>
     </section>
@@ -322,40 +370,7 @@ function Record() {
 }
 
 /* ------------------------------------------------------------------ *
- * PROCESS — #process
- * ------------------------------------------------------------------ */
-
-function Process() {
-  return (
-    <section id="process" className="sec">
-      <div className="wrap">
-        <Reveal>
-          <div className="sec-head">
-            <p className="eyebrow">The process</p>
-            <h2 className="title">
-              Four steps, in <em>order</em>.
-            </h2>
-          </div>
-        </Reveal>
-
-        <div className="steps">
-          {STEPS.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.08}>
-              <div className="step">
-                <span className="step-n">{s.n}</span>
-                <h3>{s.title}</h3>
-                <p>{s.body}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * TESTIMONIALS — empty marked slots, no fabricated quotes.
+ * TESTIMONIALS — #voices
  * ------------------------------------------------------------------ */
 
 function Voices() {
@@ -371,207 +386,90 @@ function Voices() {
           </div>
         </Reveal>
 
-        <div className="quote-grid">
-          {TESTIMONIALS.map((t, i) => (
-            <Reveal key={i} delay={i * 0.09}>
-              {t.quote ? (
-                <figure className="quote-card" style={{ margin: 0 }}>
-                  <div>
-                    <span className="quote-mark" aria-hidden>
-                      &ldquo;
-                    </span>
-                    <blockquote className="quote-text" style={{ margin: 0 }}>
-                      {t.quote}
-                    </blockquote>
-                  </div>
-                  <figcaption className="quote-attr">
-                    {t.attribution}
-                    {t.meta ? ` · ${t.meta}` : ''}
-                  </figcaption>
-                </figure>
-              ) : (
-                <div className="quote-card quote-card-empty">
-                  <span className="placeholder-tag">Testimonial slot {i + 1}</span>
-                  <p style={{ fontSize: 13.5, color: 'var(--muted)', maxWidth: '30ch', margin: 0 }}>
-                    Add a real member quote in{' '}
-                    <span className="num" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
-                      src/lib/content.ts
-                    </span>
-                    . Nothing is written here on your behalf.
-                  </p>
-                </div>
-              )}
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+        <Reveal delay={0.1}>
+          <figure className="quote-feature">
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <blockquote>&ldquo;{FEATURED_QUOTE.quote}&rdquo;</blockquote>
+            <figcaption>{FEATURED_QUOTE.attribution}</figcaption>
+          </figure>
+        </Reveal>
 
-/* ------------------------------------------------------------------ *
- * ACCESS — #access
- * ------------------------------------------------------------------ */
-
-function Access() {
-  return (
-    <section id="access" className="sec">
-      <div className="glow glow-left" aria-hidden />
-      <div className="wrap">
-        <div
-          className="access-grid"
-          style={{ display: 'grid', gap: 'clamp(40px, 5vw, 72px)', gridTemplateColumns: '1fr' }}
-        >
-          <Reveal>
-            <p className="eyebrow">Access</p>
-            <h2 className="title" style={{ marginTop: 24 }}>
-              Deliberately <em>small</em>.
-            </h2>
-            <p className="body-copy" style={{ marginTop: 26 }}>
-              A desk only works if the people in it are actually executing. Past a certain size the
-              room stops being a room and becomes a feed, so intake is kept to small groups and
-              closed between them.
-            </p>
-            <p className="body-copy">
-              There is no waitlist theatre and no countdown. When a group is open, it is open; when
-              it is not, the honest answer is to wait for the next one.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.12}>
-            <div className="frame" style={{ padding: 'clamp(30px, 4vw, 48px)' }}>
-              <p className="eyebrow eyebrow-bare" style={{ color: 'var(--gold)' }}>
-                Before you request
-              </p>
-              <ul style={{ margin: '26px 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 18 }}>
-                {[
-                  'You are trading capital you can genuinely afford to risk.',
-                  'You are willing to follow a defined risk limit, including on a good week.',
-                  'You want a methodology you can eventually run without us.',
-                  'You are here for years rather than for a fast month.',
-                ].map((line) => (
-                  <li key={line} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                    <span
-                      aria-hidden
-                      style={{
-                        flex: 'none',
-                        marginTop: 9,
-                        width: 5,
-                        height: 5,
-                        background: 'var(--gold)',
-                      }}
-                    />
-                    <span style={{ fontSize: 15.5, lineHeight: 1.65, color: 'var(--ink-2)' }}>
-                      {line}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+        <Reveal delay={0.16}>
+          <div className="shots">
+            <div className="shots-grid">
+              {MEMBER_SHOTS.map((col, i) => (
+                <ShotColumn key={i} images={col} dir={i === 1 ? 'down' : 'up'} />
+              ))}
             </div>
-          </Reveal>
-        </div>
+            <div className="shots-fade shots-fade-top" aria-hidden />
+            <div className="shots-fade shots-fade-bottom" aria-hidden />
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.22}>
+          <p
+            style={{
+              marginTop: 26,
+              fontSize: 13.5,
+              lineHeight: 1.7,
+              color: 'var(--muted)',
+              maxWidth: '70ch',
+            }}
+          >
+            Messages shared by individual members. Results are not typical, not guaranteed, and
+            depend on each person&rsquo;s own execution.
+          </p>
+        </Reveal>
       </div>
     </section>
   );
 }
 
+function ShotColumn({ images, dir }: { images: ReadonlyArray<string>; dir: 'up' | 'down' }) {
+  // Doubled so the translate(-50%) loop is seamless.
+  const loop = [...images, ...images];
+  return (
+    <div style={{ overflow: 'hidden' }}>
+      <div className={`shots-col ${dir === 'up' ? 'shots-up' : 'shots-down'}`}>
+        {loop.map((src, i) => (
+          <div className="shot" key={`${src}-${i}`}>
+            <Image src={src} alt="Message from a member" width={420} height={280} loading="lazy" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ *
- * PRICING — #pricing
+ * FAQ — #answers
  * ------------------------------------------------------------------ */
 
-function Pricing() {
+function FaqSection() {
   return (
-    <section id="pricing" className="sec">
+    <section id="answers" className="sec">
       <div className="glow" aria-hidden />
       <div className="wrap">
         <Reveal>
           <div className="sec-head-center">
-            <p className="eyebrow eyebrow-center">Membership</p>
+            <p className="eyebrow eyebrow-center">Honest answers</p>
             <h2 className="title">
-              One room, three <em>horizons</em>.
+              The questions worth <em>asking</em>.
             </h2>
           </div>
         </Reveal>
 
-        <Reveal delay={0.08}>
-          <p
-            className="body-copy"
-            style={{ marginTop: 24, marginInline: 'auto', textAlign: 'center', maxWidth: '50ch' }}
-          >
-            Every tier is the same access. The only difference is how long a horizon you are willing
-            to commit to — which is, not coincidentally, the whole thesis.
-          </p>
+        <Reveal delay={0.1}>
+          <Faq />
         </Reveal>
 
-        <div className="price-grid">
-          {TIERS.map((t, i) => (
-            <Reveal key={t.name} delay={0.12 + i * 0.08}>
-              <div className={`price-card${t.featured ? ' price-card-featured' : ''}`} style={{ height: '100%' }}>
-                {t.featured && <span className="price-badge">Best value</span>}
-                <span className="price-name">{t.name}</span>
-                <div className="price-amount">{t.price}</div>
-                <p className="price-cadence">{t.cadence}</p>
-                {/* Always rendered so the blurb and CTA line up across tiers,
-                    even on the one with no per-month equivalent. */}
-                <p className="price-equiv">{t.equiv ?? ' '}</p>
-                <p className="price-blurb">{t.blurb}</p>
-                <CtaButton
-                  variant={t.featured ? 'primary' : 'ghost'}
-                  className="price-cta"
-                >
-                  Request access
-                </CtaButton>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={0.3}>
-          <p
-            style={{
-              marginTop: 32,
-              textAlign: 'center',
-              fontSize: 13,
-              color: 'var(--muted)',
-            }}
-          >
-            Membership is arranged through the Telegram desk. Nothing is charged on this site.
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * FINAL CTA
- * ------------------------------------------------------------------ */
-
-function FinalCta() {
-  return (
-    <section className="sec">
-      <div className="glow" aria-hidden />
-      <div className="wrap" style={{ textAlign: 'center' }}>
-        <Reveal>
-          <p className="eyebrow eyebrow-center">The Compound</p>
-          <h2
-            className="title"
-            style={{
-              marginTop: 26,
-              fontSize: 'clamp(36px, 6.4vw, 76px)',
-              maxWidth: '16ch',
-              marginInline: 'auto',
-            }}
-          >
-            Discipline is the only edge that <em>keeps paying</em>.
-          </h2>
-        </Reveal>
-
-        <Reveal delay={0.12}>
-          <div style={{ marginTop: 40, display: 'flex', justifyContent: 'center' }}>
-            <CtaButton size="lg">Request access</CtaButton>
+        <Reveal delay={0.16}>
+          <div style={{ marginTop: 'clamp(44px, 5vw, 68px)', textAlign: 'center' }}>
+            <CtaButton size="lg">Join Now</CtaButton>
           </div>
-          <p className="cta-note">Small groups. Opened deliberately.</p>
         </Reveal>
       </div>
     </section>
@@ -630,7 +528,7 @@ function CtaButton({
   className = '',
 }: {
   children: React.ReactNode;
-  variant?: 'primary' | 'ghost';
+  variant?: 'primary' | 'ghost' | 'metal';
   size?: 'lg';
   className?: string;
 }) {
