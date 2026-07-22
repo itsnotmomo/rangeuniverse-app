@@ -39,13 +39,14 @@ export default function Home() {
  * HERO
  * ------------------------------------------------------------------ */
 
-// The real footage is tried first; the generated loop stays as a fallback so
-// the hero never renders bare if the file is missing.
-const HERO_SOURCES = [
-  { src: '/home%20page.mp4', type: 'video/mp4' },
-  { src: '/media/hero.webm', type: 'video/webm' },
-  { src: '/media/hero.mp4', type: 'video/mp4' },
-] as const;
+// Derived from the master footage at public/homepage.mp4 — trimmed to the
+// clean 15.5s before the burned-in title card appears, desaturated and warmed
+// into the champagne palette, and cross-faded end-to-start so the loop has no
+// visible seam. See the encode recipe in README.
+//
+// mp4 only: VP9 encoded larger than h264 on this material, and h264 is
+// universally supported, so a second source would only cost bytes.
+const HERO_SOURCES = [{ src: '/media/hero.mp4', type: 'video/mp4' }] as const;
 
 function Hero() {
   return (
