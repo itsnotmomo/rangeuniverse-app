@@ -24,42 +24,15 @@ export const HERO_SUB = 'Where discipline compounds.';
  * WHAT IS THE COMPOUND — what it is not, and what it is.
  * ------------------------------------------------------------------ */
 
-export const IS_NOT: ReadonlyArray<{ head: string; body: string }> = [
-  {
-    head: 'Not a signals room',
-    body: 'We do not sell entries to be copied blindly. A position you cannot explain is a position you should not hold.',
-  },
-  {
-    head: 'Not gambling',
-    body: 'Size and invalidation are decided before a trade is opened, never renegotiated after it moves against us.',
-  },
-  {
-    head: 'Not get-rich-quick',
-    body: 'Nothing here compounds in a week. The whole premise is that it compounds over years, which requires you to still be here.',
-  },
-  {
-    head: 'Not a guru room',
-    body: 'No lifestyle content, no rented cars, no screenshots of a balance you cannot verify.',
-  },
-];
-
-export const IS: ReadonlyArray<{ head: string; body: string }> = [
-  {
-    head: 'A private execution desk',
-    body: 'One methodology, written down, applied the same way every session by everyone in the room.',
-  },
-  {
-    head: 'Risk before return',
-    body: 'Every position carries a defined loss before it carries a target. Capital preservation is the first job.',
-  },
-  {
-    head: 'A daily rhythm',
-    body: 'Outlook in the morning, execution during the sessions, an honest review at the end of the week.',
-  },
-  {
-    head: 'A standard held mutually',
-    body: 'Members are held to the process, and so are we. The record is published whichever way it goes.',
-  },
+/**
+ * Read as one continuous statement rather than a split list — the same content
+ * as the old is/is-not columns, set as centred prose.
+ */
+export const STATEMENT: ReadonlyArray<string> = [
+  'Most rooms in this industry are built to be joined, not to be stayed in. The Compound is built the other way around. It is worth being precise about the difference.',
+  'It is not a signals room. We do not sell entries to be copied blindly — a position you cannot explain is a position you should not hold. It is not gambling: size and invalidation are decided before a trade is opened, never renegotiated after it moves against us. It is not get-rich-quick, because nothing here compounds in a week; the whole premise is that it compounds over years, which requires you to still be here. And it is not a guru room. No lifestyle content, no rented cars, no screenshots of a balance you cannot verify.',
+  'What it is, is a private execution desk. One methodology, written down, applied the same way every session by everyone in the room. Risk before return — every position carries a defined loss before it carries a target, because capital preservation is the first job. A daily rhythm: outlook in the morning, execution during the sessions, an honest review at the end of the week.',
+  'And a standard held mutually. Members are held to the process, and so are we. The record is published whichever way it goes.',
 ];
 
 /* ------------------------------------------------------------------ *
@@ -175,7 +148,7 @@ export const PRICE = {
 
 export const FEATURED_QUOTE = {
   eyebrow: 'Members, in their own words',
-  quote: 'The analysis is worth every dollar. Nothing I’ve ever subscribed to comes close.',
+  quote: 'The daily analysis alone is worth every dollar. Nothing I’ve ever subscribed to comes close.',
   attribution: 'Member, Range Compound',
 } as const;
 

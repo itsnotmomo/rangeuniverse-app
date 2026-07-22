@@ -6,17 +6,15 @@ import {
   HERO_POINTS,
   HERO_SUB,
   INSIDE,
-  IS,
-  IS_NOT,
   MEMBER_SHOTS,
   PRICE,
+  STATEMENT,
   STATS,
 } from '@/lib/content';
 import { RECORD } from '@/lib/record';
 import { CountUp, Reveal } from '@/lib/motion';
 import { Faq } from '@/components/Faq';
 import { FeatureVideo } from '@/components/FeatureVideo';
-import { HeroVideo } from '@/components/HeroVideo';
 import { RecordHistory } from '@/components/RecordHistory';
 import { SiteHeader } from '@/components/SiteHeader';
 
@@ -45,54 +43,55 @@ export default function Home() {
  * HERO
  * ------------------------------------------------------------------ */
 
-// Derived from the master footage at public/homepage.mp4 — trimmed to the
-// clean 15.5s before the burned-in title card appears, desaturated and warmed
-// into the champagne palette, and cross-faded end-to-start so the loop has no
-// visible seam. See the encode recipe in README.
-//
-// mp4 only: VP9 encoded larger than h264 on this material, and h264 is
-// universally supported, so a second source would only cost bytes.
-const HERO_SOURCES = [{ src: '/media/hero.mp4', type: 'video/mp4' }] as const;
+// Placeholder media while the real hero footage is prepared. The slot and its
+// poster stay put; only the file behind them changes.
+const HERO_MEDIA = { src: '/media/hero.mp4', poster: '/media/hero-poster.jpg' };
 
 function Hero() {
   return (
     <section className="hero">
-      <HeroVideo poster="/media/hero-poster.jpg" sources={HERO_SOURCES} />
-      <div className="hero-scrim" aria-hidden />
+      <div className="glow" aria-hidden />
+      <div className="wrap hero-stack">
+        <Reveal>
+          <h1 className="hero-title">
+            A place for serious <em>long-term wealth builders</em>.
+          </h1>
+        </Reveal>
 
-      <div className="hero-body">
-        <div className="wrap">
-          <Reveal>
-            <h1 className="hero-title">
-              A place for serious <em>long-term wealth builders</em>.
-            </h1>
-          </Reveal>
+        <Reveal delay={0.1}>
+          <ul className="hero-points">
+            {HERO_POINTS.map((point) => (
+              <li className="hero-point" key={point}>
+                <span className="hero-point-tick" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6">
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                {point}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
 
-          <Reveal delay={0.1}>
-            <ul className="hero-points">
-              {HERO_POINTS.map((point) => (
-                <li className="hero-point" key={point}>
-                  <span className="hero-point-tick" aria-hidden>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6">
-                      <path d="M5 13l4 4L19 7" />
-                    </svg>
-                  </span>
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+        <Reveal delay={0.18}>
+          <p className="hero-sub">{HERO_SUB}</p>
+        </Reveal>
 
-          <Reveal delay={0.2}>
-            <div className="hero-cta">
-              <CtaButton>Join Now</CtaButton>
-            </div>
-          </Reveal>
+        <Reveal delay={0.24}>
+          <div className="hero-cta">
+            <CtaButton>Join Now</CtaButton>
+          </div>
+        </Reveal>
 
-          <Reveal delay={0.28}>
-            <p className="hero-sub">{HERO_SUB}</p>
-          </Reveal>
-        </div>
+        <Reveal delay={0.3}>
+          <div className="hero-media">
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <span className="corner" aria-hidden />
+            <FeatureVideo src={HERO_MEDIA.src} poster={HERO_MEDIA.poster} />
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -105,54 +104,23 @@ function Hero() {
 function WhatIsIt() {
   return (
     <section id="standard" className="sec">
-      <div className="glow glow-left" aria-hidden />
+      <div className="glow" aria-hidden />
       <div className="wrap">
         <Reveal>
-          <div className="sec-head">
-            <p className="eyebrow">What is The Compound?</p>
-            <h2 className="title">
+          <div className="sec-head-center">
+            <p className="eyebrow eyebrow-center eyebrow-lg">What is The Compound?</p>
+            <h2 className="title-lg" style={{ marginTop: 24, maxWidth: '15ch', marginInline: 'auto' }}>
               A desk, not a <em>signals room</em>.
             </h2>
           </div>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <p className="body-copy" style={{ marginTop: 28 }}>
-            Most rooms in this industry are built to be joined, not to be stayed in. The Compound is
-            built the other way round. It is worth being precise about the difference.
-          </p>
-        </Reveal>
-
-        <div className="neg-grid">
-          <Reveal className="neg-col" delay={0.14}>
-            <div className="neg-col-head" style={{ color: 'var(--muted)' }}>
-              <span>What it is not</span>
-            </div>
-            {IS_NOT.map((item) => (
-              <div className="neg-item" key={item.head}>
-                <h3>
-                  <span className="neg-mark neg-mark-no" aria-hidden />
-                  {item.head}
-                </h3>
-                <p>{item.body}</p>
-              </div>
-            ))}
-          </Reveal>
-
-          <Reveal className="neg-col" delay={0.22}>
-            <div className="neg-col-head" style={{ color: 'var(--gold)' }}>
-              <span>What it is</span>
-            </div>
-            {IS.map((item) => (
-              <div className="neg-item" key={item.head}>
-                <h3>
-                  <span className="neg-mark neg-mark-yes" aria-hidden />
-                  {item.head}
-                </h3>
-                <p>{item.body}</p>
-              </div>
-            ))}
-          </Reveal>
+        <div className="statement">
+          {STATEMENT.map((para, i) => (
+            <Reveal key={para.slice(0, 24)} delay={0.08 + i * 0.06}>
+              <p>{para}</p>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
@@ -170,8 +138,8 @@ function Inside() {
       <div className="wrap">
         <Reveal>
           <div className="sec-head-center">
-            <p className="eyebrow eyebrow-center">Inside the desk</p>
-            <h2 className="title">
+            <p className="eyebrow eyebrow-center eyebrow-lg">Inside the desk</p>
+            <h2 className="title-lg" style={{ marginTop: 24, maxWidth: '17ch', marginInline: 'auto' }}>
               What a membership actually <em>includes</em>.
             </h2>
           </div>
@@ -327,18 +295,18 @@ function Skeptic() {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <p className="body-copy">
+            <p className="body-copy body-lg">
               You have almost certainly been pitched a room like this before, by someone with a
               screenshot and a countdown timer. Scepticism is the correct starting position, and we
               would rather you keep it than talk you out of it.
             </p>
-            <p className="body-copy">
+            <p className="body-copy body-lg">
               So we are not going to argue. There is no urgency here, no fabricated scarcity, no
               claim about what a month is going to return. What we will do is show the methodology
               before you commit to it, publish the record whichever way it goes, and hold the losing
               weeks in the same place as the winning ones.
             </p>
-            <p className="body-copy">
+            <p className="body-copy body-lg">
               If that reads as underwhelming next to the alternative, that is the point. Restraint is
               the product.
             </p>
