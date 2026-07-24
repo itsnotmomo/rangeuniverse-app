@@ -1597,3 +1597,69 @@ a {
   .stat-grid-6 { grid-template-columns: repeat(3, 1fr) !important; }
 }
 
+/* ============================================================
+   GRAPHIC-LED SECTIONS — full-bleed banner + copy/graphic split
+   Copy here is graphic-first by request: the asset carries the
+   section, the words are trimmed to a headline and one line.
+   ============================================================ */
+
+/* --- Section 01 — full-bleed 3:1 banner above centred copy --- */
+.sec-banner { text-align: center; }
+
+/* .sec carries no inline padding of its own (that lives on .wrap), so a direct
+   child spans the full viewport width — the banner is full-bleed for free. */
+.banner-media { margin-bottom: clamp(34px, 4.5vw, 60px); }
+
+.banner-graphic {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 1;          /* space reserved before load => zero CLS */
+  object-fit: cover;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Keep the wide band from collapsing into an unreadable sliver on phones —
+   desktop stays a true 3:1, mobile shifts to a taller crop. */
+@media (max-width: 640px) {
+  .banner-graphic { aspect-ratio: 16 / 9; }
+}
+
+.banner-copy { max-width: 720px; margin-inline: auto; }
+.banner-copy .title { margin-inline: auto; max-width: 18ch; }
+
+.banner-line {
+  margin: clamp(20px, 2.4vw, 28px) auto 0;
+  max-width: 56ch;
+  font-family: var(--f-display);
+  font-size: clamp(19px, 2.1vw, 25px);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* --- Section 02 — copy left, square graphic right; stacks on mobile --- */
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(36px, 5vw, 64px);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .split { grid-template-columns: 1.05fr 0.95fr; }
+}
+
+/* Below the breakpoint the copy comes first in the source, so the graphic
+   naturally stacks underneath it. Cap and centre it so it isn't oversized. */
+@media (max-width: 899px) {
+  .split-media { width: 100%; max-width: 460px; margin-inline: auto; }
+}
+
+.split-graphic {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;          /* space reserved before load => zero CLS */
+  object-fit: cover;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+

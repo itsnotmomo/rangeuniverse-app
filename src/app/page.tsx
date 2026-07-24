@@ -8,7 +8,6 @@ import {
   INSIDE,
   MEMBER_SHOTS,
   PRICE,
-  STATEMENT,
   STATS,
 } from '@/lib/content';
 import { RECORD } from '@/lib/record';
@@ -97,23 +96,33 @@ function Hero() {
 function WhatIsIt() {
   return (
     <section id="standard" className="sec">
-      <div className="glow" aria-hidden />
+      <div className="glow glow-left" aria-hidden />
       <div className="wrap">
-        <Reveal>
-          <div className="sec-head-center">
-            <p className="eyebrow eyebrow-center eyebrow-lg">What is The Compound?</p>
-            <h2 className="title-lg" style={{ marginTop: 24, maxWidth: '15ch', marginInline: 'auto' }}>
+        <div className="split">
+          <Reveal className="split-copy">
+            {/* DRAFT COPY — pending Elias approval */}
+            <p className="eyebrow eyebrow-lg">What is The Compound?</p>
+            <h2 className="title-lg" style={{ marginTop: 22, maxWidth: '12ch' }}>
               A desk, not a <em>signals room</em>.
             </h2>
-          </div>
-        </Reveal>
+            <p className="body-copy body-lg" style={{ marginTop: 24 }}>
+              One methodology, written down and applied the same way every session — risk decided
+              before return, the record published whichever way it goes. Nothing drip-fed, nothing
+              held back for an upsell.
+            </p>
+          </Reveal>
 
-        <div className="statement">
-          {STATEMENT.map((para, i) => (
-            <Reveal key={para.slice(0, 24)} delay={0.08 + i * 0.06}>
-              <p>{para}</p>
-            </Reveal>
-          ))}
+          <Reveal delay={0.12} dir="right" className="split-media">
+            {/* Square 1:1 placeholder until the real asset is dropped in at the same path. */}
+            <Image
+              src="/graphics/section-02.svg"
+              alt=""
+              width={800}
+              height={800}
+              className="split-graphic"
+              unoptimized
+            />
+          </Reveal>
         </div>
       </div>
     </section>
@@ -269,42 +278,35 @@ function Record() {
 
 function Skeptic() {
   return (
-    <section id="proof" className="sec">
-      <div className="wrap">
-        <div
-          className="skeptic-grid"
-          style={{
-            display: 'grid',
-            gap: 'clamp(36px, 5vw, 72px)',
-            gridTemplateColumns: '1fr',
-            alignItems: 'start',
-          }}
-        >
-          <Reveal>
-            <p className="eyebrow">On scepticism</p>
-            <h2 className="title" style={{ marginTop: 24 }}>
-              Everyone is selling something. <em>Most of it is noise.</em>
-            </h2>
-          </Reveal>
+    <section id="proof" className="sec sec-banner">
+      {/* Full-bleed graphic — sits directly on the section so it spans the
+          viewport, above the copy. Placeholder until the real 3:1 asset is
+          dropped in at the same path. */}
+      <div className="banner-media">
+        <Image
+          src="/graphics/section-01.svg"
+          alt=""
+          width={1500}
+          height={500}
+          className="banner-graphic"
+          unoptimized
+        />
+      </div>
 
-          <Reveal delay={0.12}>
-            <p className="body-copy body-lg">
-              You have almost certainly been pitched a room like this before, by someone with a
-              screenshot and a countdown timer. Scepticism is the correct starting position, and we
-              would rather you keep it than talk you out of it.
+      <div className="wrap">
+        <Reveal>
+          <div className="banner-copy">
+            {/* DRAFT COPY — pending Elias approval */}
+            <p className="eyebrow eyebrow-center">On scepticism</p>
+            <h2 className="title" style={{ marginTop: 22 }}>
+              Everyone is selling <em>noise</em>.
+            </h2>
+            <p className="banner-line">
+              We show the methodology first, publish the record whichever way it goes, and keep the
+              losing weeks beside the winning ones.
             </p>
-            <p className="body-copy body-lg">
-              So we are not going to argue. There is no urgency here, no fabricated scarcity, no
-              claim about what a month is going to return. What we will do is show the methodology
-              before you commit to it, publish the record whichever way it goes, and hold the losing
-              weeks in the same place as the winning ones.
-            </p>
-            <p className="body-copy body-lg">
-              If that reads as underwhelming next to the alternative, that is the point. Restraint is
-              the product.
-            </p>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

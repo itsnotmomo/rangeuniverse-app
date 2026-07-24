@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" role="img" aria-label="Placeholder — Section 01, 3:1">
+  <rect width="1500" height="500" fill="#111315"/>
+  <rect x="12" y="12" width="1476" height="476" fill="none" stroke="#C9A961" stroke-width="1.5" opacity="0.7"/>
+  <text x="750" y="250" fill="#C9A961" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="30" letter-spacing="8" text-anchor="middle" dominant-baseline="middle">SECTION 01 — 3:1</text>
+</svg>
