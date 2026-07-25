@@ -296,7 +296,7 @@ function Skeptic() {
           <div className="banner-copy">
             {/* COPY — approved by Mohamed */}
             <h2 className="title" style={{ marginTop: 22 }}>
-              Why spend years learning it <em>alone</em>?
+              Why waste years learning it <em>alone</em>?
             </h2>
             <p className="banner-line">
               The best trades don&rsquo;t come from a screen. They come from someone who&rsquo;s
@@ -311,9 +311,14 @@ function Skeptic() {
               who&rsquo;ve done this long enough to know what actually repeats and what actually
               works — and the methodology and system behind every trade, as it happens.
             </p>
-            {/* These two close the section as separate lines by request — do not merge. */}
-            <p className="banner-line">The opportunities matter.</p>
-            <p className="banner-line">The people helping you find them matter even more.</p>
+            {/* One paragraph, two lines: the break is kept but the paragraph
+                gap is not, so these close as a single block. Do not split into
+                two <p> — that reintroduces the spacing. */}
+            <p className="banner-line">
+              The opportunities matter.
+              <br />
+              The people helping you find them matter even more.
+            </p>
           </div>
         </Reveal>
       </div>

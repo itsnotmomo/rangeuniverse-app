@@ -1627,13 +1627,18 @@ a {
 .banner-copy { max-width: 720px; margin-inline: auto; }
 .banner-copy .title { margin-inline: auto; max-width: 18ch; }
 
+/* Body copy reads left-aligned while the headline stays centred on
+   .sec-banner — so the ragged edge is deliberate, not inherited. The zero
+   inline margin keeps the measure flush with the left edge of .banner-copy
+   instead of floating a centred box. */
 .banner-line {
-  margin: clamp(20px, 2.4vw, 28px) auto 0;
+  margin: clamp(20px, 2.4vw, 28px) 0 0;
   max-width: 56ch;
   font-family: var(--f-display);
   font-size: clamp(19px, 2.1vw, 25px);
   line-height: 1.5;
   color: var(--ink-2);
+  text-align: left;
 }
 
 /* --- Section 02 — copy left, square graphic right; stacks on mobile --- */
