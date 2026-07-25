@@ -300,22 +300,20 @@ function Skeptic() {
             </h2>
             <p className="banner-line">
               The best trades don&rsquo;t come from a screen. They come from someone who&rsquo;s
-              already sat through the years you&rsquo;re about to spend — the drawdowns, the fake
-              breakouts, the setups that only look obvious in hindsight.
+              already sat through the years you&rsquo;re about to spend.
             </p>
             <p className="banner-line">
-              That experience is rare, and most people either guard it or were never worth listening
-              to in the first place.
+              Experience is rare, and most people either guard it or were never worth listening to
+              in the first place.
             </p>
             <p className="banner-line">
               The Compound exists because of that. Direct calls in real time, from people
-              who&rsquo;ve done this long enough to know what actually repeats — and the methodology
-              behind every one, taught as it happens. Not signals to copy blindly. A way of seeing
-              the market you keep for good.
+              who&rsquo;ve done this long enough to know what actually repeats and what actually
+              works — and the methodology and system behind every trade, as it happens.
             </p>
-            <p className="banner-line">
-              The opportunities matter. The way you learn to find them matters more.
-            </p>
+            {/* These two close the section as separate lines by request — do not merge. */}
+            <p className="banner-line">The opportunities matter.</p>
+            <p className="banner-line">The people helping you find them matter even more.</p>
           </div>
         </Reveal>
       </div>
