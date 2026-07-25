@@ -113,14 +113,13 @@ function WhatIsIt() {
           </Reveal>
 
           <Reveal delay={0.12} dir="right" className="split-media">
-            {/* Square 1:1 placeholder until the real asset is dropped in at the same path. */}
+            {/* Square 1:1 asset. */}
             <Image
-              src="/graphics/section-02.svg"
+              src="/graphics/section-02.png"
               alt=""
-              width={800}
-              height={800}
+              width={1254}
+              height={1254}
               className="split-graphic"
-              unoptimized
             />
           </Reveal>
         </div>
