@@ -279,16 +279,15 @@ function Skeptic() {
   return (
     <section id="proof" className="sec sec-banner">
       {/* Full-bleed graphic — sits directly on the section so it spans the
-          viewport, above the copy. Placeholder until the real 3:1 asset is
-          dropped in at the same path. */}
+          viewport, above the copy. The 3:2 source is centre-cropped by the
+          banner's 3:1 (16:9 on mobile) frame via object-fit: cover. */}
       <div className="banner-media">
         <Image
-          src="/graphics/section-01.svg"
+          src="/graphics/section-01.jpg"
           alt=""
-          width={1500}
-          height={500}
+          width={1600}
+          height={1065}
           className="banner-graphic"
-          unoptimized
         />
       </div>
 
