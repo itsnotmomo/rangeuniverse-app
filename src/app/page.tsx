@@ -27,8 +27,8 @@ export default function Home() {
         <WhatIsIt />
         <Inside />
         <Record />
-        <Skeptic />
         <FeatureBlocks />
+        <Skeptic />
         <FeaturedQuote />
         <Pricing />
         <Voices />
@@ -294,14 +294,27 @@ function Skeptic() {
       <div className="wrap">
         <Reveal>
           <div className="banner-copy">
-            {/* DRAFT COPY — pending Elias approval */}
-            <p className="eyebrow eyebrow-center">On scepticism</p>
+            {/* COPY — approved by Mohamed */}
             <h2 className="title" style={{ marginTop: 22 }}>
-              Everyone is selling <em>noise</em>.
+              Why spend years learning it <em>alone</em>?
             </h2>
             <p className="banner-line">
-              We show the methodology first, publish the record whichever way it goes, and keep the
-              losing weeks beside the winning ones.
+              The best trades don&rsquo;t come from a screen. They come from someone who&rsquo;s
+              already sat through the years you&rsquo;re about to spend — the drawdowns, the fake
+              breakouts, the setups that only look obvious in hindsight.
+            </p>
+            <p className="banner-line">
+              That experience is rare, and most people either guard it or were never worth listening
+              to in the first place.
+            </p>
+            <p className="banner-line">
+              The Compound exists because of that. Direct calls in real time, from people
+              who&rsquo;ve done this long enough to know what actually repeats — and the methodology
+              behind every one, taught as it happens. Not signals to copy blindly. A way of seeing
+              the market you keep for good.
+            </p>
+            <p className="banner-line">
+              The opportunities matter. The way you learn to find them matters more.
             </p>
           </div>
         </Reveal>
