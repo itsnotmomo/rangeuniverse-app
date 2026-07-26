@@ -154,10 +154,10 @@ export const FEATURED_QUOTE = {
 /* ------------------------------------------------------------------ *
  * FEATURE BLOCKS — alternating text + framed media.
  *
- * NOTE: public/Strategy.mp4 and public/Vault.mp4 are currently byte-identical
- * copies of public/homepage.mp4. The encodes below are cut from different
- * segments so the page does not show the same loop three times, but both slots
- * need real footage. Re-run the recipe in the README after replacing them.
+ * NOTE: the Vault slot now plays real footage, served straight from
+ * public/media/vault.mp4. The Strategy slot is still a placeholder cut from
+ * public/homepage.mp4 via public/Strategy.mp4, so it wants real footage —
+ * re-run the recipe in the README after replacing that source.
  * ------------------------------------------------------------------ */
 
 export type Feature = {
