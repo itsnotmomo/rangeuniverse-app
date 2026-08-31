@@ -328,8 +328,12 @@ function Skeptic() {
 
 /* ------------------------------------------------------------------ *
  * FEATURE BLOCKS — #system
- * Alternating copy and framed media. See the note in src/lib/content.ts about
- * the placeholder footage.
+ *
+ * The System reads as a single centred column of copy; The Vault keeps the
+ * two-column copy + framed media grid. Which one a block gets is decided by
+ * whether it carries media at all, not by its position — see the Feature type
+ * in src/lib/content.ts. The alternation index is still `i`, so The Vault
+ * stays `feature-alt` (media left, copy right) exactly as before.
  * ------------------------------------------------------------------ */
 
 function FeatureBlocks() {
@@ -337,23 +341,46 @@ function FeatureBlocks() {
     <section id="system" className="sec">
       <div className="glow" aria-hidden />
       <div className="wrap">
-        {FEATURES.map((f, i) => (
-          <div className={`feature${i % 2 === 1 ? ' feature-alt' : ''}`} key={f.eyebrow}>
-            <Reveal className="feature-copy" dir={i % 2 === 1 ? 'right' : 'left'}>
-              <p className="eyebrow">{f.eyebrow}</p>
-              <h2 className="title-sm">
-                {f.title} <em>{f.accent}</em>.
-              </h2>
-              {f.body.map((para) => (
-                <p key={para.slice(0, 24)}>{para}</p>
-              ))}
-            </Reveal>
+        {FEATURES.map((f, i) =>
+          f.video && f.poster ? (
+            <div className={`feature${i % 2 === 1 ? ' feature-alt' : ''}`} key={f.eyebrow}>
+              <Reveal className="feature-copy" dir={i % 2 === 1 ? 'right' : 'left'}>
+                <p className="eyebrow">{f.eyebrow}</p>
+                <h2 className="title-sm">
+                  {f.title} <em>{f.accent}</em>.
+                </h2>
+                {f.body.map((para) => (
+                  <p key={para.slice(0, 24)}>{para}</p>
+                ))}
+              </Reveal>
 
-            <Reveal delay={0.12} dir={i % 2 === 1 ? 'left' : 'right'}>
-              <FeatureVideo src={f.video} poster={f.poster} />
-            </Reveal>
-          </div>
-        ))}
+              <Reveal delay={0.12} dir={i % 2 === 1 ? 'left' : 'right'}>
+                <FeatureVideo src={f.video} poster={f.poster} />
+              </Reveal>
+            </div>
+          ) : (
+            <div className="feature-solo" key={f.eyebrow}>
+              <Reveal>
+                <div className="sec-head-center">
+                  <p className="eyebrow eyebrow-center">{f.eyebrow}</p>
+                  <h2 className="title-sm">
+                    {f.title} <em>{f.accent}</em>.
+                  </h2>
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.08}>
+                <div className="feature-solo-body">
+                  {f.body.map((para) => (
+                    <p className="body-copy" key={para.slice(0, 24)}>
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+          ),
+        )}
       </div>
     </section>
   );

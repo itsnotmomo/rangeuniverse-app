@@ -152,12 +152,12 @@ export const FEATURED_QUOTE = {
 } as const;
 
 /* ------------------------------------------------------------------ *
- * FEATURE BLOCKS — alternating text + framed media.
+ * FEATURE BLOCKS — text, optionally paired with framed media.
  *
- * NOTE: the Vault slot now plays real footage, served straight from
- * public/media/vault.mp4. The Strategy slot is still a placeholder cut from
- * public/homepage.mp4 via public/Strategy.mp4, so it wants real footage —
- * re-run the recipe in the README after replacing that source.
+ * A block with `video`/`poster` renders as the two-column grid. A block
+ * without them renders as a single centred column — that is what The System
+ * is now. The Vault slot plays real footage, served straight from
+ * public/media/vault.mp4.
  * ------------------------------------------------------------------ */
 
 export type Feature = {
@@ -165,8 +165,9 @@ export type Feature = {
   title: string;
   accent: string;
   body: ReadonlyArray<string>;
-  video: string;
-  poster: string;
+  /** Both present => two-column block. Both absent => centred, text only. */
+  video?: string;
+  poster?: string;
 };
 
 export const FEATURES: ReadonlyArray<Feature> = [
@@ -178,8 +179,9 @@ export const FEATURES: ReadonlyArray<Feature> = [
       'Members do not receive conclusions. They watch the read being built — the levels that matter, the conditions that would invalidate it, and the reasoning behind every position as it is taken.',
       'It is the same framework every session, documented and unchanging, so the thing you are learning is transferable. The aim is that you eventually run it without us.',
     ],
-    video: '/media/strategy.mp4',
-    poster: '/media/strategy-poster.jpg',
+    // Text only, centred. The placeholder strategy clip that used to sit here
+    // was removed; public/media/strategy.mp4 and its poster are still on disk
+    // but are no longer referenced anywhere.
   },
   {
     eyebrow: 'The Vault',

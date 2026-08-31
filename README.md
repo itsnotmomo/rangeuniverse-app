@@ -91,11 +91,14 @@ material, so a second source would only cost bytes.
 `public/media/vault.mp4` is real footage and is served as-is — it is not a
 derived encode, so there is no source file at the public root for it.
 
-`public/media/strategy.mp4` is still produced from `public/Strategy.mp4` at
-`gblur=sigma=5` and `-crf 33`, cut from 0–8s.
+`public/media/strategy.mp4` is **no longer served.** The System block is now
+centred copy with no media, so the file, its poster, and the
+`public/Strategy.mp4` source it was cut from are all unreferenced. They are
+kept on disk rather than deleted. The recipe, if the block ever takes footage
+again: `gblur=sigma=5`, `-crf 33`, cut from 0–8s.
 
-> **`Strategy.mp4` is a byte-identical copy of `homepage.mp4`** and remains a
-> placeholder. Replace that source with real footage and re-run the encode.
+> **`Strategy.mp4` is a byte-identical copy of `homepage.mp4`** and was always
+> a placeholder — which is why the block dropped it rather than shipping it.
 
 `src/components/HeroVideo.tsx` paints the poster first and only requests the
 video when the visitor's environment allows it: no request at all under

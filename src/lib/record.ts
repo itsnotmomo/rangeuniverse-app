@@ -12,8 +12,20 @@ export type MonthStat = {
   trades: number;
   wins: number;
   losses: number;
-  /** Cumulative R multiple for the month, in whole R x100. */
-  rr: number;
+  /**
+   * Cumulative R multiple for the month, in whole R x100.
+   *
+   * Optional: nothing in the UI reads it, and it was not supplied for the
+   * months added after Jun 2026. Omitted rather than invented — see the rule
+   * at the top of src/lib/content.ts.
+   */
+  rr?: number;
+  /**
+   * Stored, not computed. Nine of the rows below disagree with
+   * round(wins / trades * 100) — Dec 2024 most visibly — so this is the
+   * published figure for the month, not a derivation of the two columns
+   * beside it. New rows carry the client-supplied number.
+   */
   winRatePct: number;
   gainPct: number;
 };
@@ -52,6 +64,9 @@ export const MONTHS: MonthStat[] = [
   { month: 'April',     year: 2026, trades: 23, wins: 13, losses: 10, rr: 148, winRatePct: 57, gainPct: 7.1 },
   { month: 'May',       year: 2026, trades: 18, wins: 8,  losses: 10, rr: 92,  winRatePct: 44, gainPct: 2.2 },
   { month: 'June',      year: 2026, trades: 16, wins: 8,  losses: 8,  rr: 102, winRatePct: 50, gainPct: 3.1 },
+  // No R multiple supplied for these two; see the note on `rr` above.
+  { month: 'July',      year: 2026, trades: 12, wins: 8,  losses: 4,  winRatePct: 67, gainPct: 1.8 },
+  { month: 'August',    year: 2026, trades: 19, wins: 10, losses: 9,  winRatePct: 53, gainPct: 4.3 },
 ];
 
 const MONTH_ORDER = [
@@ -82,6 +97,10 @@ function build() {
   return {
     months: ordered.length,
     totalTrades,
+    // Unweighted mean of the monthly win rates — NOT pooled wins / trades.
+    // A 12-trade month counts as much as a 58-trade one. Kept as-is because it
+    // is the figure that has been published all along; the two methods differ
+    // (mean 50% vs pooled 50% today, 49% vs 50% before Jul/Aug 2026).
     avgWinRatePct: Math.round(
       MONTHS.reduce((t, m) => t + m.winRatePct, 0) / MONTHS.length,
     ),
