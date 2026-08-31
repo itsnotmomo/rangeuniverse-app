@@ -1439,6 +1439,30 @@ a {
   max-width: 52ch;
 }
 
+/* --- Text-only feature block (The System) ---------------------------
+   No media well, so there is no grid at all: the head reuses the shared
+   .sec-head-center pattern and the body reuses .body-copy at the same 56ch
+   measure as the centred prose in the track-record section. Nothing here
+   declares columns or gaps, so there is nothing for mobile to inherit. */
+.feature-solo { text-align: center; }
+
+/* .title-sm is roughly half the size of .title, so it takes no measure of its
+   own — the 900px .sec-head-center cap holds it, and the line breaks where the
+   column runs out. */
+.sec-head-center .title-sm { margin-top: 24px; margin-inline: auto; }
+
+.feature-solo-body { margin-top: 24px; }
+
+.feature-solo-body .body-copy {
+  margin-inline: auto;
+  max-width: 56ch;
+  text-align: center;
+}
+
+/* The block rhythm between features is a sibling rule on .feature, so the
+   text-only block has to re-declare it for whatever follows. */
+.feature-solo + .feature { margin-top: clamp(56px, 6.5vw, 96px); }
+
 .feature-media {
   position: relative;
   aspect-ratio: 16 / 10;
