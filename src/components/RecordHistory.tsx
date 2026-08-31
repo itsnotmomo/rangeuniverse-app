@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MONTHS, fmtPct } from '@/lib/record';
+import { MONTHS, fmtPct, winRatePct } from '@/lib/record';
 
 const MONTH_ORDER = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -12,8 +12,9 @@ const MONTH_ORDER = [
  * The full month-by-month log, collapsed by default.
  *
  * Newest first — someone opening this wants to see the recent months before
- * the 2023 ones. Rows come straight from src/lib/record.ts; nothing is
- * computed or rounded here beyond what the log already holds.
+ * the 2023 ones. Rows come straight from src/lib/record.ts. The win rate is
+ * the one derived column, and it is derived there rather than here so the
+ * table and the headline stat cannot disagree.
  */
 export function RecordHistory() {
   const [open, setOpen] = useState(false);
@@ -66,7 +67,7 @@ export function RecordHistory() {
                     <td className="num">{m.trades}</td>
                     <td className="num">{m.wins}</td>
                     <td className="num">{m.losses}</td>
-                    <td className="num">{m.winRatePct}%</td>
+                    <td className="num">{winRatePct(m)}%</td>
                     <td className={`num ${m.gainPct < 0 ? 'history-neg' : 'history-pos'}`}>
                       {fmtPct(m.gainPct)}
                     </td>
